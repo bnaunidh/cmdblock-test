@@ -12,146 +12,162 @@
   // ── Maintenance mode ───────────────────────────────────
   // Set MAINTENANCE_UNTIL to an ISO timestamp to lock the site behind a
   // countdown overlay until that time. Set to '' to disable.
-  // Examples:
-  //   '2026-05-19T17:00:00-07:00'   ← 5:00 PM Pacific (PDT)
-  //   '2026-12-01T17:00:00-08:00'   ← 5:00 PM Pacific (PST, winter)
-  //   ''                            ← maintenance off, site loads normally
+  //   '2026-05-19T17:00:00-07:00'  ← 5:00 PM Pacific (PDT, summer)
+  //   '2026-12-01T17:00:00-08:00'  ← 5:00 PM Pacific (PST, winter)
+  //   ''                           ← maintenance off
   const MAINTENANCE_UNTIL = '2026-05-19T17:00:00-07:00';
-  const MAINTENANCE_LABEL = 'Returning May 19 · 5:00 PM PST';
-  const MAINTENANCE_BLURB = "cmdblock.org is getting an upgrade. We'll be live again at 5:00 PM PST.";
+  const MAINTENANCE_LABEL = '// SCHEDULED MAINTENANCE';
+  const MAINTENANCE_RETURN_TEXT = '5:00 PM PST';
 
   (function initMaintenance() {
     if (!MAINTENANCE_UNTIL) return;
     const until = new Date(MAINTENANCE_UNTIL);
     if (isNaN(+until) || until <= new Date()) return;
 
+    // Derive current page label from the URL.
+    const pageNames = {
+      '': 'Home', 'index': 'Home',
+      'learn': 'Learn', 'lesson': 'Lesson',
+      'projects': 'Projects', 'projects-easy': 'Projects · Easy',
+      'projects-medium': 'Projects · Medium', 'projects-hard': 'Projects · Hard',
+      'resources': 'Resources', 'tools': 'Tools',
+      'connect': 'Connect', 'profile': 'Profile',
+      'iron-course': 'Iron Course', 'emerald-course': 'Emerald Course',
+      'diamond-course': 'Diamond Course',
+      'java-iron-course': 'Java · Iron', 'java-emerald-course': 'Java · Emerald',
+      'java-diamond-course': 'Java · Diamond', 'java-netherite-course': 'Java · Netherite',
+    };
+    const slug = (location.pathname.split('/').pop() || 'index').replace(/\.html$/i, '');
+    const pageLabel = pageNames[slug] || slug.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+
     const css = `
       html.cb-maint-on, html.cb-maint-on body { overflow: hidden !important; }
-      #cb-maintenance {
-        position: fixed; inset: 0; z-index: 2147483647;
-        background: radial-gradient(ellipse at top, #0a1410 0%, #07080B 60%, #050608 100%);
-        color: #E6E7EA;
-        display: flex; flex-direction: column;
-        align-items: center; justify-content: center;
-        font-family: 'Inter', system-ui, -apple-system, sans-serif;
-        padding: 32px 24px; text-align: center; overflow: hidden;
-        animation: cbMaintFade 0.5s ease-out;
+      #cmdblock-update-overlay { position: fixed; inset: 0; z-index: 2147483647; background: #0D0D12;
+        display: flex; align-items: center; justify-content: center;
+        font-family: "DM Sans", -apple-system, BlinkMacSystemFont, sans-serif;
+        color: #E8E6E3; padding: 24px; overflow: auto; }
+      #cmdblock-update-overlay::before { content: ""; position: absolute; inset: 0;
+        background: radial-gradient(ellipse 60% 50% at 50% 35%, rgba(85,255,85,0.06), transparent 70%);
+        pointer-events: none; }
+      #cmdblock-update-overlay * { box-sizing: border-box; }
+      #cmdblock-update-overlay .cmu-card { position: relative; max-width: 560px; width: 100%; text-align: center; padding: 56px 40px; }
+      #cmdblock-update-overlay .cmu-logo { margin-bottom: 28px; display: flex; align-items: center; justify-content: center; position: relative; z-index: 2; }
+      #cmdblock-update-overlay .cmu-logo img { height: 104px; width: auto; image-rendering: pixelated; object-fit: contain; display: block;
+        filter: drop-shadow(0 0 24px rgba(85,255,85,0.25)) drop-shadow(0 4px 12px rgba(0,0,0,0.5)); }
+      #cmdblock-update-overlay .cmu-icons { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
+      #cmdblock-update-overlay .cmu-icons img { position: absolute; image-rendering: pixelated; object-fit: contain; opacity: 0.16; filter: drop-shadow(0 6px 14px rgba(0,0,0,0.6)); }
+      #cmdblock-update-overlay .cmu-i1 { top: 8%; left: 6%; width: 88px; height: 88px; transform: rotate(-12deg); }
+      #cmdblock-update-overlay .cmu-i2 { top: 12%; right: 7%; width: 78px; height: 78px; transform: rotate(15deg); }
+      #cmdblock-update-overlay .cmu-i3 { top: 42%; left: 4%; width: 104px; height: 104px; transform: rotate(-6deg); opacity: 0.12; }
+      #cmdblock-update-overlay .cmu-i4 { top: 46%; right: 5%; width: 96px; height: 96px; transform: rotate(8deg); opacity: 0.13; }
+      #cmdblock-update-overlay .cmu-i5 { bottom: 10%; left: 14%; width: 72px; height: 72px; transform: rotate(20deg); }
+      #cmdblock-update-overlay .cmu-i6 { bottom: 14%; right: 13%; width: 80px; height: 80px; transform: rotate(-18deg); }
+      #cmdblock-update-overlay .cmu-i7 { top: 24%; left: 22%; width: 60px; height: 60px; transform: rotate(28deg); opacity: 0.1; }
+      #cmdblock-update-overlay .cmu-i8 { bottom: 30%; right: 24%; width: 56px; height: 56px; transform: rotate(-22deg); opacity: 0.1; }
+      @media (max-width: 760px) {
+        #cmdblock-update-overlay .cmu-i7, #cmdblock-update-overlay .cmu-i8 { display: none; }
+        #cmdblock-update-overlay .cmu-icons img { opacity: 0.1; }
+        #cmdblock-update-overlay .cmu-i1, #cmdblock-update-overlay .cmu-i2, #cmdblock-update-overlay .cmu-i5, #cmdblock-update-overlay .cmu-i6 { width: 56px; height: 56px; }
+        #cmdblock-update-overlay .cmu-i3, #cmdblock-update-overlay .cmu-i4 { width: 64px; height: 64px; }
       }
-      @keyframes cbMaintFade { from { opacity: 0; } to { opacity: 1; } }
-      #cb-maintenance::before {
-        content: ''; position: absolute; inset: -40px;
-        background-image:
-          linear-gradient(rgba(85,255,85,0.05) 1px, transparent 1px),
-          linear-gradient(90deg, rgba(85,255,85,0.05) 1px, transparent 1px);
-        background-size: 42px 42px;
-        -webkit-mask-image: radial-gradient(ellipse at center, black 25%, transparent 75%);
-                mask-image: radial-gradient(ellipse at center, black 25%, transparent 75%);
-        pointer-events: none;
-      }
-      #cb-maintenance > * { position: relative; z-index: 1; }
-      #cb-maintenance .cb-mlogo {
-        font-family: 'Silkscreen', monospace;
-        font-size: 0.8rem; letter-spacing: 3px;
-        color: #6F7178; margin-bottom: 36px;
-      }
-      #cb-maintenance .cb-mlogo .green { color: #55FF55; }
-      #cb-maintenance h1 {
-        font-family: 'Silkscreen', monospace;
-        font-size: clamp(2.2rem, 7vw, 4.5rem);
-        color: #55FF55;
-        margin: 0 0 16px;
-        letter-spacing: 4px;
-        text-shadow: 0 0 30px rgba(85,255,85,0.45), 0 0 70px rgba(85,255,85,0.2);
-        line-height: 1;
-      }
-      #cb-maintenance .cb-msub {
-        color: #9A9CA3;
-        font-size: clamp(0.95rem, 1.5vw, 1.1rem);
-        max-width: 540px; line-height: 1.6;
-        margin: 0 0 48px;
-      }
-      #cb-maintenance .cb-countdown {
-        display: inline-flex; gap: 12px;
-        font-family: 'JetBrains Mono', ui-monospace, monospace;
-        font-weight: 600;
-      }
-      #cb-maintenance .cb-unit {
-        background: rgba(85,255,85,0.05);
-        border: 1px solid rgba(85,255,85,0.22);
-        border-radius: 12px;
-        padding: 16px 18px 12px;
-        min-width: 88px;
-        display: flex; flex-direction: column; align-items: center;
-      }
-      #cb-maintenance .cb-unit .n {
-        font-size: clamp(1.8rem, 4.5vw, 2.6rem);
-        color: #E6E7EA; line-height: 1;
-        font-variant-numeric: tabular-nums;
-      }
-      #cb-maintenance .cb-unit .l {
-        font-family: 'Silkscreen', monospace;
-        font-size: 0.62rem; letter-spacing: 2px;
-        color: #6F7178; margin-top: 8px;
-      }
-      #cb-maintenance .cb-eta {
-        margin-top: 32px;
-        font-family: 'JetBrains Mono', ui-monospace, monospace;
-        font-size: 0.74rem; letter-spacing: 2px;
-        color: #6F7178; text-transform: uppercase;
-      }
-      #cb-maintenance .cb-eta .dot {
-        display: inline-block; width: 6px; height: 6px; border-radius: 50%;
-        background: #55FF55; margin-right: 8px; vertical-align: middle;
-        box-shadow: 0 0 8px #55FF55;
-        animation: cbDot 1.6s ease-in-out infinite;
-      }
-      @keyframes cbDot { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
-      @media (max-width: 520px) {
-        #cb-maintenance .cb-countdown { gap: 6px; }
-        #cb-maintenance .cb-unit { min-width: 64px; padding: 12px 8px 10px; }
-        #cb-maintenance .cb-unit .l { font-size: 0.55rem; letter-spacing: 1px; }
+      #cmdblock-update-overlay .cmu-tag { font-family: "Silkscreen", monospace; font-size: 0.55rem; color: #FCDB05;
+        letter-spacing: 3.5px; margin-bottom: 18px; text-transform: uppercase; }
+      #cmdblock-update-overlay .cmu-page { font-family: "Silkscreen", monospace; font-size: 0.5rem; color: #55FF55;
+        letter-spacing: 3px; margin-bottom: 22px; text-transform: uppercase; opacity: 0.85; }
+      #cmdblock-update-overlay .cmu-page .arrow { color: #5A5A60; margin: 0 8px; }
+      #cmdblock-update-overlay h1 { font-family: "Silkscreen", monospace; font-size: clamp(2rem, 5vw, 3rem);
+        line-height: 1.1; margin: 0 0 20px; color: #E8E6E3; letter-spacing: 1px; font-weight: 400; }
+      #cmdblock-update-overlay h1 .g { color: #55FF55; }
+      #cmdblock-update-overlay .cmu-msg { font-size: 0.98rem; color: #9A9790; margin: 0 0 44px;
+        line-height: 1.6; max-width: 380px; margin-left: auto; margin-right: auto; }
+      #cmdblock-update-overlay .cmu-msg strong { color: #E8E6E3; font-weight: 600; }
+      #cmdblock-update-overlay .cmu-countdown { display: flex; justify-content: center; align-items: center;
+        gap: 10px; margin: 0 0 8px; font-family: "JetBrains Mono", monospace; }
+      #cmdblock-update-overlay .cmu-unit { display: flex; flex-direction: column; align-items: center; min-width: 78px; }
+      #cmdblock-update-overlay .cmu-num { font-family: "Silkscreen", monospace; font-size: 2.4rem; color: #55FF55;
+        display: block; line-height: 1; letter-spacing: 1px; font-weight: 400; }
+      #cmdblock-update-overlay .cmu-label { font-family: "Silkscreen", monospace; font-size: 0.5rem; color: #5A5A60;
+        letter-spacing: 2px; margin-top: 14px; text-transform: uppercase; }
+      #cmdblock-update-overlay .cmu-sep { font-family: "Silkscreen", monospace; font-size: 2.4rem; color: #2A2A30; line-height: 1; margin-top: -14px; }
+      #cmdblock-update-overlay .cmu-foot { font-family: "Silkscreen", monospace; font-size: 0.5rem; color: #5A5A60;
+        letter-spacing: 2.5px; margin-top: 48px; }
+      @media (max-width: 480px) {
+        #cmdblock-update-overlay .cmu-card { padding: 40px 22px; }
+        #cmdblock-update-overlay .cmu-unit { min-width: 60px; }
+        #cmdblock-update-overlay .cmu-num { font-size: 1.8rem; }
+        #cmdblock-update-overlay .cmu-sep { font-size: 1.8rem; }
+        #cmdblock-update-overlay .cmu-logo { margin-bottom: 22px; }
+        #cmdblock-update-overlay .cmu-msg { margin-bottom: 32px; }
       }
     `;
 
     const html = `
-      <div id="cb-maintenance" role="dialog" aria-label="Site under maintenance">
-        <div class="cb-mlogo">CMD<span class="green">BLOCK</span></div>
-        <h1>BE RIGHT BACK</h1>
-        <p class="cb-msub">${MAINTENANCE_BLURB}</p>
-        <div class="cb-countdown" id="cb-countdown" aria-live="polite">
-          <div class="cb-unit"><span class="n" data-k="d">--</span><span class="l">DAYS</span></div>
-          <div class="cb-unit"><span class="n" data-k="h">--</span><span class="l">HOURS</span></div>
-          <div class="cb-unit"><span class="n" data-k="m">--</span><span class="l">MIN</span></div>
-          <div class="cb-unit"><span class="n" data-k="s">--</span><span class="l">SEC</span></div>
+      <div id="cmdblock-update-overlay">
+        <div class="cmu-card" role="dialog" aria-live="polite" aria-label="Site under maintenance">
+          <div class="cmu-icons" aria-hidden="true">
+            <img class="cmu-i1" src="assets/icons/bedrock.png" alt="">
+            <img class="cmu-i2" src="assets/icons/Grass_Block.png" alt="">
+            <img class="cmu-i3" src="assets/icons/diamond-removebg-preview.png" alt="">
+            <img class="cmu-i4" src="assets/icons/netherite_icon.png" alt="">
+            <img class="cmu-i5" src="assets/icons/emerald-removebg-preview.png" alt="">
+            <img class="cmu-i6" src="assets/icons/iron-removebg-preview.png" alt="">
+            <img class="cmu-i7" src="assets/icons/Golden_Apple.png" alt="">
+            <img class="cmu-i8" src="assets/icons/commandblock.png" alt="">
+          </div>
+          <div class="cmu-logo">
+            <img src="assets/icons/cmdblock_icon-no-bg.png" alt="CMDBLOCK">
+          </div>
+          <div class="cmu-tag">Redesign Update</div>
+          <div class="cmu-page">You were on<span class="arrow">›</span>${pageLabel}</div>
+          <h1>HANG ON <span class="g">TIGHT!</span></h1>
+          <p class="cmu-msg">CMDBLOCK is updating. Come back at <strong>${MAINTENANCE_RETURN_TEXT}</strong>.</p>
+          <div class="cmu-countdown" id="cmu-countdown">
+            <div class="cmu-unit"><span class="cmu-num" data-k="d">00</span><div class="cmu-label">Days</div></div>
+            <div class="cmu-sep">:</div>
+            <div class="cmu-unit"><span class="cmu-num" data-k="h">00</span><div class="cmu-label">Hours</div></div>
+            <div class="cmu-sep">:</div>
+            <div class="cmu-unit"><span class="cmu-num" data-k="m">00</span><div class="cmu-label">Minutes</div></div>
+            <div class="cmu-sep">:</div>
+            <div class="cmu-unit"><span class="cmu-num" data-k="s">00</span><div class="cmu-label">Seconds</div></div>
+          </div>
+          <div class="cmu-foot">${MAINTENANCE_LABEL}</div>
         </div>
-        <div class="cb-eta"><span class="dot"></span>${MAINTENANCE_LABEL}</div>
       </div>
     `;
 
     let timerId = 0;
-    function pad(n) { return String(n).padStart(2, '0'); }
+    function pad(n) { n = String(n); return n.length < 2 ? '0' + n : n; }
     function tick() {
       const ms = +until - Date.now();
       if (ms <= 0) {
-        document.getElementById('cb-maintenance')?.remove();
-        document.getElementById('cb-maintenance-style')?.remove();
+        document.getElementById('cmdblock-update-overlay')?.remove();
+        document.getElementById('cmdblock-update-overlay-style')?.remove();
         document.documentElement.classList.remove('cb-maint-on');
         if (timerId) clearInterval(timerId);
         return;
       }
-      const d = Math.floor(ms / 86400000);
-      const h = Math.floor((ms % 86400000) / 3600000);
-      const m = Math.floor((ms % 3600000) / 60000);
-      const s = Math.floor((ms % 60000) / 1000);
-      const root = document.getElementById('cb-countdown');
+      const totalSec = Math.floor(ms / 1000);
+      const d = Math.floor(totalSec / 86400);
+      const h = Math.floor((totalSec % 86400) / 3600);
+      const m = Math.floor((totalSec % 3600) / 60);
+      const s = totalSec % 60;
+      const root = document.getElementById('cmu-countdown');
       if (!root) return;
       const setN = (k, v) => { const el = root.querySelector(`[data-k="${k}"]`); if (el) el.textContent = pad(v); };
       setN('d', d); setN('h', h); setN('m', m); setN('s', s);
     }
+    function injectFonts() {
+      if (document.getElementById('cmu-font-link')) return;
+      const l = document.createElement('link');
+      l.id = 'cmu-font-link'; l.rel = 'stylesheet';
+      l.href = 'https://fonts.googleapis.com/css2?family=Silkscreen:wght@400;700&family=DM+Sans:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap';
+      document.head.appendChild(l);
+    }
     function show() {
-      if (document.getElementById('cb-maintenance')) return;
+      if (document.getElementById('cmdblock-update-overlay')) return;
+      injectFonts();
       const style = document.createElement('style');
-      style.id = 'cb-maintenance-style';
+      style.id = 'cmdblock-update-overlay-style';
       style.textContent = css;
       document.head.appendChild(style);
       const wrap = document.createElement('div');

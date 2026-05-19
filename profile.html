@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Profile — CMDBLOCK</title>
+<meta name="description" content="Your profile, settings, progress, and achievements.">
+<link rel="icon" type="image/png" href="assets/favicon/favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Silkscreen:wght@400;700&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css?v=3">
+<style>
+  .profile-shell {
+    display: grid;
+    grid-template-columns: 320px 1fr;
+    gap: 24px;
+    padding-top: 100px;
+  }
+  @media (max-width: 880px) { .profile-shell { grid-template-columns: 1fr; padding-top: 90px; } }
+
+  .profile-aside { position: sticky; top: 80px; align-self: start; }
+  @media (max-width: 880px) { .profile-aside { position: static; } }
+
+  .profile-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 28px 24px;
+    text-align: center;
+  }
+  .profile-avatar {
+    width: 88px; height: 88px;
+    border-radius: 18px;
+    background: linear-gradient(135deg, rgba(85,255,85,0.18), rgba(74,237,217,0.12));
+    border: 1px solid rgba(85,255,85,0.25);
+    display: inline-flex; align-items: center; justify-content: center;
+    margin: 0 auto 16px;
+    font-family: 'Silkscreen', monospace;
+    font-size: 2.4rem; color: var(--cmd-green);
+  }
+  .profile-name {
+    font-family: 'Silkscreen', monospace;
+    font-size: 1.15rem; letter-spacing: 1px;
+    color: var(--text); margin-bottom: 4px;
+  }
+  .profile-role {
+    font-family: 'Silkscreen', monospace;
+    font-size: 0.62rem; letter-spacing: 1.2px;
+    color: var(--cmd-green);
+    background: rgba(85,255,85,0.06);
+    border: 1px solid rgba(85,255,85,0.18);
+    padding: 3px 10px;
+    border-radius: 999px;
+    display: inline-block;
+    margin-bottom: 16px;
+  }
+  .profile-email {
+    font-size: 0.85rem; color: var(--text-dim);
+    display: flex; align-items: center; justify-content: center; gap: 6px;
+    margin-bottom: 20px;
+  }
+  .profile-email button {
+    background: transparent; border: none;
+    color: var(--text-faint); cursor: pointer;
+    padding: 2px;
+  }
+  .profile-email button:hover { color: var(--text); }
+  .profile-stats {
+    display: grid; grid-template-columns: 1fr 1fr 1fr;
+    gap: 12px;
+    padding: 16px 0;
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 16px;
+  }
+  .ps-stat .ps-num {
+    font-family: 'Silkscreen', monospace;
+    font-size: 1.1rem; color: var(--cmd-green);
+  }
+  .ps-stat .ps-label {
+    font-size: 0.7rem; color: var(--text-dim);
+    margin-top: 2px;
+  }
+  .profile-since {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.74rem; color: var(--text-faint);
+    margin-bottom: 14px;
+  }
+  .profile-actions { display: flex; flex-direction: column; gap: 8px; }
+  .profile-actions .btn { justify-content: center; padding: 10px; }
+  .aside-tabs {
+    display: flex;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    margin-top: 14px;
+    padding: 4px;
+  }
+  .aside-tabs button {
+    flex: 1; padding: 9px;
+    background: transparent; border: none;
+    font-family: 'Silkscreen', monospace;
+    font-size: 0.7rem; letter-spacing: 1px;
+    color: var(--text-dim);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.18s;
+  }
+  .aside-tabs button.active {
+    background: rgba(85,255,85,0.08);
+    color: var(--cmd-green);
+  }
+
+  .settings-grid { display: flex; flex-direction: column; gap: 16px; }
+  .settings-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 24px;
+  }
+  .settings-card h3 {
+    font-family: 'Silkscreen', monospace;
+    font-size: 0.78rem; letter-spacing: 1.2px;
+    color: var(--text);
+    margin-bottom: 18px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid var(--border);
+  }
+  .settings-card.danger h3 { color: var(--cmd-red); }
+  .setting-row {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--border);
+    gap: 16px;
+  }
+  .setting-row:last-child { border-bottom: none; }
+  .setting-info { flex: 1; min-width: 0; }
+  .setting-name { font-size: 0.95rem; color: var(--text); margin-bottom: 2px; }
+  .setting-desc { font-size: 0.84rem; color: var(--text-dim); }
+
+  .progress-list { display: flex; flex-direction: column; gap: 10px; }
+  .progress-row { display: flex; align-items: center; gap: 14px; padding: 10px 0; }
+  .progress-row .name { width: 90px; font-family: 'Silkscreen', monospace; font-size: 0.68rem; letter-spacing: 1px; color: var(--text-dim); flex-shrink: 0; }
+  .progress-row .bar { flex: 1; height: 6px; background: rgba(255,255,255,0.05); border-radius: 999px; overflow: hidden; }
+  .progress-row .fill { height: 100%; background: linear-gradient(90deg, var(--cmd-green), var(--diamond)); border-radius: 999px; }
+  .progress-row .pct { width: 50px; text-align: right; font-family: 'JetBrains Mono', monospace; font-size: 0.78rem; color: var(--text); }
+
+  .achievements-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 14px; }
+  .achievement {
+    aspect-ratio: 1;
+    padding: 16px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    text-align: center;
+    transition: all 0.25s;
+    cursor: default;
+  }
+  .achievement.unlocked {
+    background: rgba(85,255,85,0.05);
+    border-color: rgba(85,255,85,0.2);
+  }
+  .achievement.locked { filter: grayscale(1); opacity: 0.5; }
+  .achievement-icon {
+    width: 40px; height: 40px;
+    margin-bottom: 10px;
+    image-rendering: pixelated;
+  }
+  .achievement-name {
+    font-family: 'Silkscreen', monospace;
+    font-size: 0.62rem; letter-spacing: 0.8px;
+    color: var(--text);
+    line-height: 1.3;
+  }
+  .achievement-desc {
+    font-size: 0.7rem; color: var(--text-dim);
+    margin-top: 4px;
+    line-height: 1.3;
+  }
+
+  .empty-state {
+    text-align: center;
+    padding: 60px 24px;
+    background: var(--bg-card);
+    border: 1px dashed var(--border-strong);
+    border-radius: var(--radius-lg);
+  }
+  .empty-state .empty-icon {
+    width: 56px; height: 56px;
+    margin: 0 auto 16px;
+    display: inline-flex; align-items: center; justify-content: center;
+    background: rgba(255,255,255,0.04);
+    border-radius: 14px;
+    color: var(--text-dim);
+  }
+  .empty-state h3 { font-family: 'Silkscreen', monospace; font-size: 1rem; letter-spacing: 1px; margin-bottom: 8px; }
+  .empty-state p { color: var(--text-dim); margin-bottom: 18px; }
+</style>
+</head>
+<body>
+
+<div class="orb orb-1"></div>
+<div class="orb orb-2"></div>
+
+<nav class="app-nav">
+  <div class="container">
+    <a href="index.html" class="logo"><img src="assets/favicon/favicon.png" alt="" class="logo-cube"><span>CMD<span class="accent">BLOCK</span></span></a>
+    <ul class="nav-links">
+      <li><a href="learn.html">Learn</a></li><li><a href="projects.html">Projects</a></li><li><a href="resources.html">Resources</a></li><li><a href="tools.html">Tools</a></li><li><a href="connect.html">Connect</a></li>
+    </ul>
+    <div class="nav-actions">
+      <a href="#" class="nav-cta desktop-only" data-account-cta>Sign Up</a>
+      <button class="mobile-toggle" id="menuBtn" aria-label="Menu"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="18" y2="18"/></svg></button>
+    </div>
+  </div>
+</nav>
+<div class="mobile-nav" id="mobileNav">
+  <a href="learn.html">Learn</a><a href="projects.html">Projects</a><a href="resources.html">Resources</a><a href="tools.html">Tools</a><a href="connect.html">Connect</a>
+  <a href="#" class="nav-cta" data-account-cta>Sign Up</a>
+</div>
+
+<main class="container">
+  <div class="profile-shell">
+    <aside class="profile-aside" id="profileAside"></aside>
+    <section id="profileMain"></section>
+  </div>
+</main>
+
+<footer class="app-footer">
+  <div class="container">
+    <div class="foot-grid">
+      <div class="foot-brand"><a href="index.html" class="logo"><img src="assets/favicon/favicon.png" alt="" class="logo-cube"><span>CMD<span class="accent">BLOCK</span></span></a><p>Learn Minecraft commands the way creators actually use them.</p></div>
+      <div class="foot-col"><h5>Learn</h5><a href="learn.html">Courses</a><a href="projects.html">Projects</a><a href="resources.html">Resources</a><a href="tools.html">Tools</a></div>
+      <div class="foot-col"><h5>Community</h5><a href="connect.html">Connect</a><a href="connect.html">Discord</a><a href="connect.html">GitHub</a></div>
+      <div class="foot-col"><h5>Account</h5><a href="profile.html">Profile</a><a href="mailto:hi@cmdblock.org">Contact</a><a href="#" onclick="openModal('signinModal');return false;">Sign in</a></div>
+    </div>
+    <div class="foot-bottom"><span class="pixel">CMDBLOCK © 2026</span><span>Not affiliated with Mojang or Microsoft.</span></div>
+  </div>
+</footer>
+
+<div class="modal" id="signupModal"><div class="modal-card"><button class="modal-close" onclick="closeModal('signupModal')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button><h2>CREATE ACCOUNT</h2><p class="modal-sub">Track your progress. Free, no card.</p><form id="signupForm"><input class="input" type="text" name="name" placeholder="Name" maxlength="24" required><input class="input" type="email" name="email" placeholder="you@example.com" required><div class="input-row"><input class="input" type="password" name="password" placeholder="Password" required minlength="6"><input class="input" type="password" name="confirm" placeholder="Confirm" required minlength="6"></div><div class="modal-error"></div><button class="btn btn-primary" type="submit">Create account</button></form><div class="modal-foot">Have an account? <a href="#" onclick="closeModal('signupModal');openModal('signinModal');return false;">Sign in</a></div></div></div>
+<div class="modal" id="signinModal"><div class="modal-card"><button class="modal-close" onclick="closeModal('signinModal')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button><h2>SIGN IN</h2><p class="modal-sub">Welcome back.</p><form id="signinForm"><input class="input" type="email" name="email" placeholder="you@example.com" required><input class="input" type="password" name="password" placeholder="Password" required><div class="modal-error"></div><button class="btn btn-primary" type="submit">Sign in</button></form><div class="modal-foot">New here? <a href="#" onclick="closeModal('signinModal');openModal('signupModal');return false;">Create account</a></div></div></div>
+
+<script src="scripts/cmdblock.js?v=3"></script>
+<script>
+  const aside = document.getElementById('profileAside');
+  const main = document.getElementById('profileMain');
+
+  const ACHIEVEMENTS = [
+    { id: 'first-cmd', name: 'FIRST CMD', desc: 'Ran your first command', icon: 'commandblock.png', unlock: p => p.totalLessons >= 1 },
+    { id: 'iron-clad', name: 'IRON-CLAD', desc: 'Finished the Iron course', icon: 'iron-removebg-preview.png', unlock: p => (p['bedrock-iron']?.completed || 0) >= 12 || (p['java-iron']?.completed || 0) >= 12 },
+    { id: 'emerald-mind', name: 'EMERALD MIND', desc: 'Finished the Emerald course', icon: 'emerald-removebg-preview.png', unlock: p => (p['bedrock-emerald']?.completed || 0) >= 19 || (p['java-emerald']?.completed || 0) >= 19 },
+    { id: 'diamond-hand', name: 'DIAMOND HAND', desc: 'Finished the Diamond course', icon: 'diamond-removebg-preview.png', unlock: p => (p['bedrock-diamond']?.completed || 0) >= 13 || (p['java-diamond']?.completed || 0) >= 13 },
+    { id: 'netherite', name: 'NETHERITE', desc: 'Conquered the Netherite course', icon: 'netherite_icon.png', unlock: p => (p['java-netherite']?.completed || 0) >= 8 },
+    { id: 'easy-rider', name: 'EASY RIDER', desc: 'Completed all Easy projects', icon: 'Golden_Apple.png', unlock: p => (p['projects-easy']?.completed || 0) >= 4 },
+    { id: 'mid-tier', name: 'MID TIER', desc: 'Completed all Medium projects', icon: 'Map.png', unlock: p => (p['projects-medium']?.completed || 0) >= 4 },
+    { id: 'master-builder', name: 'MASTER', desc: 'Completed all Hard projects', icon: 'four_blocks.png', unlock: p => (p['projects-hard']?.completed || 0) >= 15 },
+  ];
+
+  function render() {
+    const account = cmdblock.getAccount();
+    const progress = cmdblock.getProgress();
+    const totalLessons = Object.values(progress).reduce((s, p) => s + (p.completed || 0), 0);
+    const prefs = cmdblock.getPrefs();
+
+    if (!account) {
+      aside.innerHTML = `
+        <div class="profile-card">
+          <div class="profile-avatar">?</div>
+          <div class="profile-name">No account</div>
+          <p style="color:var(--text-dim);font-size:0.88rem;margin:8px 0 18px;">Sign in or create a free account to save your progress.</p>
+          <div class="profile-actions">
+            <button class="btn btn-primary" onclick="openModal('signupModal')">Create account</button>
+            <button class="btn btn-ghost" onclick="openModal('signinModal')">Sign in</button>
+          </div>
+        </div>`;
+      main.innerHTML = `
+        <div class="empty-state">
+          <div class="empty-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          </div>
+          <h3>YOUR PROFILE LIVES HERE</h3>
+          <p>Settings, progress, achievements — all of it.</p>
+          <button class="btn btn-primary" onclick="openModal('signupModal')">Create free account</button>
+        </div>`;
+      return;
+    }
+
+    const initial = (account.name || '?')[0].toUpperCase();
+    const since = account.since ? new Date(account.since).toLocaleDateString(undefined, { month: 'short', year: 'numeric' }) : '—';
+    const unlocked = ACHIEVEMENTS.filter(a => a.unlock({ ...progress, totalLessons }));
+    const roles = cmdblock.computeRoles(account, progress);
+    const primary = roles[0] || 'NOOBIE';
+    const primaryColor = cmdblock.ROLES[primary]?.color || '#55FF55';
+
+    aside.innerHTML = `
+      <div class="profile-card">
+        <div class="profile-avatar" style="background:linear-gradient(135deg, ${primaryColor}26, ${primaryColor}10); border-color:${primaryColor}40; color:${primaryColor};">${initial}</div>
+        <div class="profile-name">${account.name}</div>
+        <div class="profile-role-row" style="display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin-bottom:16px;">${roles.map(r => cmdblock.roleBadgeHTML(r)).join('')}</div>
+        <div class="profile-email">
+          <span id="emailMask">${'•'.repeat(Math.min(8, (account.email||'').length))}</span>
+          <button id="emailToggle" title="Show email"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg></button>
+        </div>
+        <div class="profile-stats" style="grid-template-columns:1fr 1fr;">
+          <div class="ps-stat"><div class="ps-num">${totalLessons}</div><div class="ps-label">lessons</div></div>
+          <div class="ps-stat"><div class="ps-num">${unlocked.length}</div><div class="ps-label">badges</div></div>
+        </div>
+        <div class="profile-since">Since ${since}</div>
+        <div class="profile-actions">
+          <button class="btn btn-ghost" onclick="renameUser()">Edit name</button>
+          <button class="btn btn-danger" onclick="signOut()">Sign out</button>
+        </div>
+        <div class="aside-tabs">
+          <button class="active" data-view="settings">SETTINGS</button>
+          <button data-view="achievements">BADGES</button>
+        </div>
+      </div>`;
+
+    aside.querySelector('.aside-tabs').addEventListener('click', (e) => {
+      const b = e.target.closest('button[data-view]');
+      if (!b) return;
+      aside.querySelectorAll('.aside-tabs button').forEach(x => x.classList.remove('active'));
+      b.classList.add('active');
+      renderMain(b.dataset.view);
+    });
+
+    document.getElementById('emailToggle').addEventListener('click', () => {
+      const m = document.getElementById('emailMask');
+      if (m.dataset.shown === '1') { m.textContent = '•'.repeat(Math.min(8, (account.email||'').length)); m.dataset.shown=''; }
+      else { m.textContent = account.email; m.dataset.shown='1'; }
+    });
+
+    renderMain('settings');
+  }
+
+  function renderMain(view) {
+    const account = cmdblock.getAccount();
+    const progress = cmdblock.getProgress();
+    const totalLessons = Object.values(progress).reduce((s, p) => s + (p.completed || 0), 0);
+    const prefs = cmdblock.getPrefs();
+
+    if (view === 'achievements') {
+      main.innerHTML = `
+        <div class="settings-card">
+          <h3>ACHIEVEMENTS</h3>
+          <div class="achievements-grid">
+            ${ACHIEVEMENTS.map(a => {
+              const got = a.unlock({ ...progress, totalLessons });
+              return `<div class="achievement ${got ? 'unlocked' : 'locked'}">
+                <img class="achievement-icon" src="assets/icons/${a.icon}" alt="">
+                <div class="achievement-name">${a.name}</div>
+                <div class="achievement-desc">${a.desc}</div>
+              </div>`;
+            }).join('')}
+          </div>
+        </div>`;
+      return;
+    }
+
+    const courses = [
+      { key: 'bedrock-iron', name: 'IRON (B)', count: 12 },
+      { key: 'bedrock-emerald', name: 'EMERALD (B)', count: 19 },
+      { key: 'bedrock-diamond', name: 'DIAMOND (B)', count: 13 },
+      { key: 'java-iron', name: 'IRON (J)', count: 12 },
+      { key: 'java-emerald', name: 'EMERALD (J)', count: 19 },
+      { key: 'java-diamond', name: 'DIAMOND (J)', count: 13 },
+      { key: 'java-netherite', name: 'NETHERITE', count: 8 },
+    ];
+
+    main.innerHTML = `
+      <div class="settings-grid">
+        <div class="settings-card">
+          <h3>APPEARANCE</h3>
+          <div class="setting-row">
+            <div class="setting-info"><div class="setting-name">Edition</div><div class="setting-desc">Default edition shown across the site.</div></div>
+            <div class="edition-toggle" style="margin: 0;" id="prefEdition">
+              <button class="${prefs.edition === 'bedrock' ? 'active' : ''}" data-edition="bedrock">BEDROCK</button>
+              <button class="${prefs.edition === 'java' ? 'active' : ''}" data-edition="java">JAVA</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="settings-card">
+          <h3>PREFERENCES</h3>
+          <div class="setting-row">
+            <div class="setting-info"><div class="setting-name">Confirm destructive actions</div><div class="setting-desc">Ask before reset, delete, or sign-out.</div></div>
+            <div class="switch ${prefs.confirmDestructive !== false ? 'on' : ''}" data-pref="confirmDestructive"></div>
+          </div>
+          <div class="setting-row">
+            <div class="setting-info"><div class="setting-name">Reduce motion</div><div class="setting-desc">Disable scroll-in animations.</div></div>
+            <div class="switch ${prefs.reduceMotion ? 'on' : ''}" data-pref="reduceMotion"></div>
+          </div>
+        </div>
+
+        <div class="settings-card">
+          <h3>PROGRESS</h3>
+          <div class="progress-list">
+            ${courses.map(c => {
+              const done = progress[c.key]?.completed || 0;
+              const pct = Math.round((done / c.count) * 100);
+              return `<div class="progress-row">
+                <span class="name">${c.name}</span>
+                <div class="bar"><div class="fill" style="width:${pct}%"></div></div>
+                <span class="pct">${done}/${c.count}</span>
+              </div>`;
+            }).join('')}
+          </div>
+          <div style="margin-top:18px; text-align:right;">
+            <button class="btn btn-danger btn-sm" onclick="resetProgress()">Reset all progress</button>
+          </div>
+        </div>
+
+        <div class="settings-card">
+          <h3>NOTIFICATIONS</h3>
+          <div class="setting-row">
+            <div class="setting-info"><div class="setting-name">Newsletter</div><div class="setting-desc">Monthly digest of new lessons.</div></div>
+            <div class="switch ${prefs.newsletter ? 'on' : ''}" data-pref="newsletter"></div>
+          </div>
+          <div class="setting-row">
+            <div class="setting-info"><div class="setting-name">System messages</div><div class="setting-desc">Site updates and downtime notices.</div></div>
+            <div class="switch ${prefs.systemMessages !== false ? 'on' : ''}" data-pref="systemMessages"></div>
+          </div>
+        </div>
+
+        <div class="settings-card danger">
+          <h3>DANGER ZONE</h3>
+          <div class="setting-row">
+            <div class="setting-info"><div class="setting-name">Delete account</div><div class="setting-desc">Remove your local account and all progress. Cannot be undone.</div></div>
+            <button class="btn btn-danger btn-sm" onclick="deleteAccount()">Delete</button>
+          </div>
+        </div>
+      </div>`;
+
+    main.querySelectorAll('.switch').forEach(sw => {
+      sw.addEventListener('click', () => {
+        sw.classList.toggle('on');
+        const key = sw.dataset.pref;
+        cmdblock.setPrefs({ ...cmdblock.getPrefs(), [key]: sw.classList.contains('on') });
+      });
+    });
+    main.querySelector('#prefEdition')?.addEventListener('click', (e) => {
+      const b = e.target.closest('button');
+      if (!b) return;
+      main.querySelectorAll('#prefEdition button').forEach(x => x.classList.remove('active'));
+      b.classList.add('active');
+      cmdblock.setPrefs({ ...cmdblock.getPrefs(), edition: b.dataset.edition });
+    });
+  }
+
+  async function renameUser() {
+    const a = cmdblock.getAccount();
+    const name = await cmdblock.prompt('Enter your new display name.', a.name, { title: 'EDIT NAME', maxlength: 24, okLabel: 'Save' });
+    if (name && name.trim()) {
+      cmdblock.setAccount({ ...a, name: name.trim() });
+      cmdblock.toast('Name updated', { variant: 'success' });
+    }
+  }
+  async function signOut() {
+    if (cmdblock.getPrefs().confirmDestructive !== false) {
+      const ok = await cmdblock.confirm('You can sign back in any time — your progress is saved locally.', { title: 'SIGN OUT?', okLabel: 'Sign out' });
+      if (!ok) return;
+    }
+    cmdblock.clearAccount();
+    cmdblock.toast('Signed out', { variant: 'info' });
+  }
+  async function resetProgress() {
+    if (cmdblock.getPrefs().confirmDestructive !== false) {
+      const ok = await cmdblock.confirm('Reset progress for every course and project? This can\'t be undone.', { title: 'RESET PROGRESS?', okLabel: 'Reset', danger: true });
+      if (!ok) return;
+    }
+    cmdblock.setProgress({});
+    render();
+    cmdblock.toast('All progress reset', { variant: 'warning' });
+  }
+  async function deleteAccount() {
+    const ok = await cmdblock.confirm('Permanently delete your account and all progress? This can\'t be undone.', { title: 'DELETE ACCOUNT?', okLabel: 'Delete', danger: true });
+    if (!ok) return;
+    cmdblock.clearAccount();
+    cmdblock.setProgress({});
+    cmdblock.toast('Account deleted', { variant: 'info' });
+  }
+  window.renameUser = renameUser; window.signOut = signOut; window.resetProgress = resetProgress; window.deleteAccount = deleteAccount;
+
+  // Re-render whenever account state changes (signup, signin, signout)
+  window.addEventListener('cmdblock:account', render);
+
+  render();
+</script>
+</body>
+</html>

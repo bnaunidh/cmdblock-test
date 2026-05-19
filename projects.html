@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Projects — CMDBLOCK</title>
+<meta name="description" content="23 builds across Easy, Medium and Hard. Real systems, real worlds.">
+<link rel="icon" type="image/png" href="assets/favicon/favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Silkscreen:wght@400;700&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css?v=3">
+<style>
+  .tier-card { padding: 0; overflow: hidden; display: flex; flex-direction: column; }
+  .tier-banner {
+    height: 140px;
+    display: flex; align-items: center; justify-content: center;
+    border-bottom: 1px solid var(--border);
+    position: relative;
+  }
+  .tier-banner::before {
+    content: ''; position: absolute; inset: 0;
+    background-image:
+      linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+    background-size: 16px 16px;
+    mask-image: radial-gradient(ellipse 50% 60% at 50% 50%, black, transparent);
+    -webkit-mask-image: radial-gradient(ellipse 50% 60% at 50% 50%, black, transparent);
+  }
+  .tier-banner-img {
+    height: 92px;
+    image-rendering: pixelated;
+    filter: drop-shadow(0 8px 20px rgba(0,0,0,0.4));
+    transition: transform 0.4s var(--ease);
+    position: relative; z-index: 1;
+  }
+  .tier-card:hover .tier-banner-img { transform: translateY(-4px) rotate(-2deg); }
+  .tier-body { padding: 22px 24px 24px; flex: 1; display: flex; flex-direction: column; }
+  .tier-body h3 {
+    font-family: 'Silkscreen', monospace;
+    font-size: 0.95rem; letter-spacing: 1px;
+    margin-bottom: 10px;
+  }
+  .tier-body p { font-size: 0.9rem; color: var(--text-dim); line-height: 1.55; flex: 1; margin-bottom: 14px; }
+
+  .project-card { padding: 0; overflow: hidden; display: flex; align-items: stretch; min-height: 110px; }
+  .project-banner {
+    width: 70px; flex-shrink: 0;
+    height: auto;
+    image-rendering: pixelated;
+    object-fit: contain;
+    padding: 14px;
+    background: rgba(255,255,255,0.015);
+    border-right: 1px solid var(--border);
+    transition: background 0.25s;
+  }
+  .project-card:hover .project-banner { background: rgba(255,255,255,0.04); }
+  .project-body { padding: 18px 20px; flex: 1; min-width: 0; }
+  .project-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; margin-bottom: 6px; }
+  .project-head h3 { font-size: 1rem; margin: 0; }
+  .project-tag {
+    font-family: 'Silkscreen', monospace;
+    font-size: 0.58rem; letter-spacing: 1.2px;
+    padding: 3px 8px;
+    border: 1px solid;
+    border-radius: 4px;
+    flex-shrink: 0;
+  }
+  .project-card p { font-size: 0.86rem; color: var(--text-dim); line-height: 1.5; margin: 0; }
+</style>
+</head>
+<body>
+
+<div class="orb orb-1"></div>
+<div class="orb orb-2"></div>
+<div class="orb orb-3"></div>
+
+<nav class="app-nav">
+  <div class="container">
+    <a href="index.html" class="logo"><img src="assets/favicon/favicon.png" alt="" class="logo-cube"><span>CMD<span class="accent">BLOCK</span></span></a>
+    <ul class="nav-links">
+      <li><a href="learn.html">Learn</a></li><li><a href="projects.html">Projects</a></li><li><a href="resources.html">Resources</a></li><li><a href="tools.html">Tools</a></li><li><a href="connect.html">Connect</a></li>
+    </ul>
+    <div class="nav-actions">
+      <a href="#" class="nav-cta desktop-only" data-account-cta>Sign Up</a>
+      <button class="mobile-toggle" id="menuBtn" aria-label="Menu"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="18" y2="18"/></svg></button>
+    </div>
+  </div>
+</nav>
+<div class="mobile-nav" id="mobileNav">
+  <a href="learn.html">Learn</a><a href="projects.html">Projects</a><a href="resources.html">Resources</a><a href="tools.html">Tools</a><a href="connect.html">Connect</a>
+  <a href="#" class="nav-cta" data-account-cta>Sign Up</a>
+</div>
+
+<section class="page-hero">
+  <div class="hero-grid"></div>
+  <div class="hero-content">
+    <span class="pill"><span class="pill-badge">23</span> builds, all free</span>
+    <h1 style="margin-top:24px;">Build cool <span class="green">stuff.</span></h1>
+    <p>Mini-games and systems that ship. Each project is broken into lessons you can pause, reset, and remix.</p>
+  </div>
+</section>
+
+<section class="section tight">
+  <div class="container" style="text-align:center;">
+    <div class="diff-tabs reveal" id="diffTabs">
+      <button class="diff-tab active" data-diff="all">All <span class="count">23</span></button>
+      <button class="diff-tab" data-diff="easy">Easy <span class="count">4</span></button>
+      <button class="diff-tab" data-diff="medium">Medium <span class="count">4</span></button>
+      <button class="diff-tab" data-diff="hard">Hard <span class="count">15</span></button>
+    </div>
+  </div>
+</section>
+
+<section class="section" style="padding-top:0;">
+  <div class="container">
+    <div class="grid-auto" id="tierGrid"></div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <div class="stats-grid">
+      <div class="stat reveal"><div class="stat-num" data-count="4">0</div><div class="stat-label">Easy projects</div></div>
+      <div class="stat reveal"><div class="stat-num" data-count="4">0</div><div class="stat-label">Medium projects</div></div>
+      <div class="stat reveal"><div class="stat-num" data-count="15">0</div><div class="stat-label">Hard projects</div></div>
+      <div class="stat reveal"><div class="stat-num" data-count="23">0</div><div class="stat-label">total builds</div></div>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <div class="section-head reveal">
+      <span class="eyebrow">All projects</span>
+      <h2 class="section-title">The full project list</h2>
+    </div>
+    <div class="grid-auto" id="projectList"></div>
+  </div>
+</section>
+
+<footer class="app-footer">
+  <div class="container">
+    <div class="foot-grid">
+      <div class="foot-brand"><a href="index.html" class="logo"><img src="assets/favicon/favicon.png" alt="" class="logo-cube"><span>CMD<span class="accent">BLOCK</span></span></a><p>Learn Minecraft commands the way creators actually use them.</p></div>
+      <div class="foot-col"><h5>Learn</h5><a href="learn.html">Courses</a><a href="projects.html">Projects</a><a href="resources.html">Resources</a><a href="tools.html">Tools</a></div>
+      <div class="foot-col"><h5>Community</h5><a href="connect.html">Connect</a><a href="connect.html">Discord</a><a href="connect.html">GitHub</a></div>
+      <div class="foot-col"><h5>Account</h5><a href="profile.html">Profile</a><a href="mailto:hi@cmdblock.org">Contact</a><a href="#" onclick="openModal('signinModal');return false;">Sign in</a></div>
+    </div>
+    <div class="foot-bottom"><span class="pixel">CMDBLOCK © 2026</span><span>Not affiliated with Mojang or Microsoft.</span></div>
+  </div>
+</footer>
+
+<div class="modal" id="signupModal"><div class="modal-card"><button class="modal-close" onclick="closeModal('signupModal')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button><h2>CREATE ACCOUNT</h2><p class="modal-sub">Track your progress. Free, no card.</p><form id="signupForm"><input class="input" type="text" name="name" placeholder="Name" maxlength="24" required><input class="input" type="email" name="email" placeholder="you@example.com" required><div class="input-row"><input class="input" type="password" name="password" placeholder="Password" required minlength="6"><input class="input" type="password" name="confirm" placeholder="Confirm" required minlength="6"></div><div class="modal-error"></div><button class="btn btn-primary" type="submit">Create account</button></form><div class="modal-foot">Have an account? <a href="#" onclick="closeModal('signupModal');openModal('signinModal');return false;">Sign in</a></div></div></div>
+<div class="modal" id="signinModal"><div class="modal-card"><button class="modal-close" onclick="closeModal('signinModal')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button><h2>SIGN IN</h2><p class="modal-sub">Welcome back.</p><form id="signinForm"><input class="input" type="email" name="email" placeholder="you@example.com" required><input class="input" type="password" name="password" placeholder="Password" required><div class="modal-error"></div><button class="btn btn-primary" type="submit">Sign in</button></form><div class="modal-foot">New here? <a href="#" onclick="closeModal('signinModal');openModal('signupModal');return false;">Create account</a></div></div></div>
+
+<script src="scripts/cmdblock.js?v=3"></script>
+<script>
+  const TIERS = [
+    { id: 'easy', name: 'EASY PROJECTS', desc: 'Quick wins. Elevators, weather machines, teleporter networks. Done in about 2 hours.', count: 4, time: '~2 hrs', file: 'projects-easy.html', color: 'var(--cmd-green)', banner: 'lime_banner-removebg-preview.png' },
+    { id: 'medium', name: 'MEDIUM PROJECTS', desc: 'Treasure hunts, speed-build comps, hide & seek, working traps. ~3 hours of real systems.', count: 4, time: '~3 hrs', file: 'projects-medium.html', color: 'var(--gold)', banner: 'orange_banner-removebg-preview.png' },
+    { id: 'hard', name: 'HARD PROJECTS', desc: 'PvP arena, boss fights, RPG quests, economies, wave survival, cinematics. The full kit.', count: 15, time: '~10 hrs', file: 'projects-hard.html', color: 'var(--cmd-red)', banner: 'red_banner-removebg-preview.png' },
+  ];
+
+  const PROJECTS = {
+    easy: [
+      { name: 'Command Elevator', desc: 'Teleport between floors with a single redstone press.' },
+      { name: 'Custom Death Messages', desc: 'Replace death announcements with themed lines.' },
+      { name: 'Weather Machine', desc: 'Button-driven weather control station.' },
+      { name: 'Teleporter Network', desc: 'Warp pads with particles, sounds, and arrival effects.' },
+    ],
+    medium: [
+      { name: 'Treasure Hunt Game', desc: 'Hidden treasures, hint tracker, reward chain.' },
+      { name: 'Speed Build Challenge', desc: 'Timed comp with random theme + freeze.' },
+      { name: 'Hide & Seek', desc: 'Multiplayer, seeker blindness, boundary enforcement.' },
+      { name: 'Working Traps', desc: 'Arrow rain, floor collapse, poison gas — with auto-reset.' },
+    ],
+    hard: [
+      { name: 'Mob Wave Spawner', desc: 'Scaling waves with boundary enforcement.' },
+      { name: 'Day/Night Event System', desc: 'Night raid + dawn bonus loop.' },
+      { name: 'Mini Golf Course', desc: 'Stroke counting, hole detection, par system.' },
+      { name: 'One-Block Skyblock', desc: 'Block replacement with milestone phases.' },
+      { name: 'PvP Arena Setup', desc: 'Scoreboards, teams, countdown system.' },
+      { name: 'Arena Game Loop', desc: 'Reset, repeat, broadcast winner.' },
+      { name: 'Custom Boss Fight', desc: 'Boss spawn sequence, attack cycle timer.' },
+      { name: 'Boss Attack Patterns', desc: 'Phase-based attacks, phase milestones.' },
+      { name: 'RPG Quest Engine', desc: 'Quest acceptance, completion, journal.' },
+      { name: 'Economy System', desc: 'Currency, vendors, balance scoreboard.' },
+      { name: 'Loot Table System', desc: 'Weighted loot rolls per rarity tier.' },
+      { name: 'Cinematic Sequences', desc: 'Camera positions, freeze + cutscene function.' },
+      { name: 'Parkour Course', desc: 'Per-player timer, checkpoints, leaderboard.' },
+      { name: 'Class Selection', desc: 'Class kits with stat modifiers.' },
+      { name: 'Wave Survival', desc: 'Endless waves with class scaling.' },
+    ],
+  };
+
+  const tierGrid = document.getElementById('tierGrid');
+  const projectList = document.getElementById('projectList');
+  const diffTabs = document.getElementById('diffTabs');
+
+  function renderTiers(diff) {
+    const filtered = diff === 'all' ? TIERS : TIERS.filter(t => t.id === diff);
+    const bg = { easy: 'rgba(85,255,85,0.05)', medium: 'rgba(252,219,5,0.05)', hard: 'rgba(255,92,92,0.05)' };
+    tierGrid.innerHTML = filtered.map(t => `
+      <a href="${t.file}" class="card tier-card tier-${t.id}">
+        <div class="tier-banner" style="background:linear-gradient(135deg, ${bg[t.id]}, transparent 70%);">
+          <img src="assets/icons/${t.banner}" alt="" class="tier-banner-img">
+        </div>
+        <div class="tier-body">
+          <h3 style="color:${t.color};">${t.name}</h3>
+          <p>${t.desc}</p>
+          <div class="card-meta">
+            <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> ${t.time}</span>
+            <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg> ${t.count} projects</span>
+          </div>
+        </div>
+      </a>`).join('');
+  }
+
+  function renderProjects(diff) {
+    let items;
+    if (diff === 'all') {
+      items = [
+        ...PROJECTS.easy.map(p => ({ ...p, tier: 'easy' })),
+        ...PROJECTS.medium.map(p => ({ ...p, tier: 'medium' })),
+        ...PROJECTS.hard.map(p => ({ ...p, tier: 'hard' })),
+      ];
+    } else {
+      items = PROJECTS[diff].map(p => ({ ...p, tier: diff }));
+    }
+    const tierFile = { easy: 'projects-easy.html', medium: 'projects-medium.html', hard: 'projects-hard.html' };
+    const tierColor = { easy: 'var(--cmd-green)', medium: 'var(--gold)', hard: 'var(--cmd-red)' };
+    const tierBanner = { easy: 'lime_banner-removebg-preview.png', medium: 'orange_banner-removebg-preview.png', hard: 'red_banner-removebg-preview.png' };
+    projectList.innerHTML = items.map(p => `
+      <a href="${tierFile[p.tier]}" class="card project-card">
+        <img src="assets/icons/${tierBanner[p.tier]}" alt="" class="project-banner">
+        <div class="project-body">
+          <div class="project-head">
+            <h3>${p.name}</h3>
+            <span class="project-tag" style="color:${tierColor[p.tier]};border-color:${tierColor[p.tier]}55;">${p.tier.toUpperCase()}</span>
+          </div>
+          <p>${p.desc}</p>
+        </div>
+      </a>`).join('');
+  }
+
+  function setDiff(diff) {
+    diffTabs.querySelectorAll('.diff-tab').forEach(b => b.classList.toggle('active', b.dataset.diff === diff));
+    renderTiers(diff);
+    renderProjects(diff);
+  }
+  diffTabs.addEventListener('click', (e) => {
+    const btn = e.target.closest('.diff-tab');
+    if (btn) setDiff(btn.dataset.diff);
+  });
+  setDiff('all');
+</script>
+</body>
+</html>

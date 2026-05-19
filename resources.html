@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Resources — CMDBLOCK</title>
+<meta name="description" content="Community-built tools and pro tips for Bedrock and Java command creators.">
+<link rel="icon" type="image/png" href="assets/favicon/favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Silkscreen:wght@400;700&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css?v=3">
+<style>
+  /* Command Library (moved from home) */
+  .lib-tabs { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 28px; }
+  .lib-tab {
+    padding: 9px 14px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    font-size: 0.86rem; color: var(--text-dim);
+    cursor: pointer; transition: all 0.2s;
+    font-family: 'Inter', sans-serif; font-weight: 500;
+  }
+  .lib-tab:hover { color: var(--text); border-color: var(--border-strong); }
+  .lib-tab.active { background: rgba(85,255,85,0.08); border-color: rgba(85,255,85,0.3); color: var(--cmd-green); }
+  .lib-tab .count { margin-left: 6px; font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; opacity: 0.7; }
+  .lib-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; }
+  .cmd-row {
+    display: flex; align-items: center; gap: 14px;
+    padding: 14px 16px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    transition: all 0.2s;
+  }
+  .cmd-row:hover { border-color: rgba(85,255,85,0.3); background: rgba(85,255,85,0.03); }
+  .cmd-row .cmd-name { font-family: 'JetBrains Mono', monospace; font-size: 0.88rem; color: var(--text); flex: 1; }
+  .cmd-row .cmd-name .slash { color: var(--cmd-green); }
+  .cmd-row .cmd-copy {
+    width: 28px; height: 28px;
+    display: inline-flex; align-items: center; justify-content: center;
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--text-dim);
+    cursor: pointer; transition: all 0.15s;
+  }
+  .cmd-row .cmd-copy:hover { color: var(--cmd-green); border-color: rgba(85,255,85,0.3); background: rgba(85,255,85,0.06); }
+  .cmd-row .cmd-copy svg { width: 14px; height: 14px; }
+  .cmd-row.copied .cmd-copy { color: var(--cmd-green); border-color: rgba(85,255,85,0.4); background: rgba(85,255,85,0.1); }
+</style>
+<style>
+  .tool-card {
+    display: flex; flex-direction: column;
+    padding: 24px;
+  }
+  .tool-card .tool-head {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 14px;
+  }
+  .tool-card h3 { font-family: 'Silkscreen', monospace; font-size: 0.86rem; letter-spacing: 1px; color: var(--text); margin: 0; }
+  .tool-platform {
+    font-family: 'Silkscreen', monospace; font-size: 0.58rem; letter-spacing: 1.2px;
+    color: var(--text-dim); padding: 3px 8px;
+    border: 1px solid var(--border); border-radius: 4px;
+  }
+  .tool-platform.java { color: var(--diamond); border-color: rgba(74,237,217,0.25); }
+  .tool-platform.bedrock { color: var(--cmd-green); border-color: rgba(85,255,85,0.25); }
+  .tool-platform.both { color: var(--gold); border-color: rgba(252,219,5,0.25); }
+  .tool-card p { font-size: 0.9rem; color: var(--text-dim); line-height: 1.5; margin-bottom: 16px; flex: 1; }
+  .tool-link {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 0.85rem; font-weight: 500;
+    color: var(--cmd-green); text-decoration: none;
+    margin-top: auto;
+  }
+  .tool-link svg { width: 12px; height: 12px; transition: transform 0.2s; }
+  .tool-link:hover svg { transform: translate(2px, -2px); }
+  .tip-item {
+    display: flex; gap: 18px;
+    padding: 22px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    transition: all 0.25s;
+  }
+  .tip-item:hover { border-color: var(--border-strong); background: var(--bg-card-hover); }
+  .tip-num {
+    font-family: 'Silkscreen', monospace;
+    font-size: 1.4rem;
+    color: var(--cmd-green);
+    flex-shrink: 0;
+    line-height: 1;
+    min-width: 36px;
+  }
+  .tip-body h4 { font-size: 1rem; margin-bottom: 6px; color: var(--text); }
+  .tip-body p { font-size: 0.9rem; color: var(--text-dim); line-height: 1.6; }
+  .tip-body code { font-family: 'JetBrains Mono', monospace; font-size: 0.85em; color: var(--cmd-green); background: rgba(85,255,85,0.06); padding: 1px 5px; border-radius: 3px; }
+</style>
+</head>
+<body>
+
+<div class="orb orb-1"></div>
+<div class="orb orb-2"></div>
+<div class="orb orb-3"></div>
+
+<nav class="app-nav">
+  <div class="container">
+    <a href="index.html" class="logo"><img src="assets/favicon/favicon.png" alt="" class="logo-cube"><span>CMD<span class="accent">BLOCK</span></span></a>
+    <ul class="nav-links">
+      <li><a href="learn.html">Learn</a></li><li><a href="projects.html">Projects</a></li><li><a href="resources.html">Resources</a></li><li><a href="tools.html">Tools</a></li><li><a href="connect.html">Connect</a></li>
+    </ul>
+    <div class="nav-actions">
+      <a href="#" class="nav-cta desktop-only" data-account-cta>Sign Up</a>
+      <button class="mobile-toggle" id="menuBtn" aria-label="Menu"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="18" y2="18"/></svg></button>
+    </div>
+  </div>
+</nav>
+<div class="mobile-nav" id="mobileNav">
+  <a href="learn.html">Learn</a><a href="projects.html">Projects</a><a href="resources.html">Resources</a><a href="tools.html">Tools</a><a href="connect.html">Connect</a>
+  <a href="#" class="nav-cta" data-account-cta>Sign Up</a>
+</div>
+
+<section class="page-hero">
+  <div class="hero-grid"></div>
+  <div class="hero-content">
+    <span class="pill"><span class="pill-badge">80+</span> commands · 7 tools · 6 tips</span>
+    <h1 style="margin-top:24px;">Resources &amp; <span class="green">links.</span></h1>
+    <p>The full command reference, tools and tips built by the community. Nothing affiliate, nothing sponsored.</p>
+  </div>
+</section>
+
+<!-- COMMAND LIBRARY (moved from home) -->
+<section class="section" id="commands" style="padding-top:60px;">
+  <div class="container">
+    <div class="section-head reveal">
+      <span class="eyebrow">Command Library</span>
+      <h2 class="section-title">80+ commands per edition, fully documented</h2>
+      <p class="section-sub">Filter by category. Click to copy. Both Bedrock and Java syntax covered.</p>
+    </div>
+    <div class="lib-tabs reveal" id="libTabs">
+      <button class="lib-tab active" data-cat="all">All <span class="count">80+</span></button>
+      <button class="lib-tab" data-cat="world">World <span class="count">15</span></button>
+      <button class="lib-tab" data-cat="player">Player <span class="count">14</span></button>
+      <button class="lib-tab" data-cat="entity">Entity <span class="count">10</span></button>
+      <button class="lib-tab" data-cat="blocks">Blocks <span class="count">8</span></button>
+      <button class="lib-tab" data-cat="logic">Logic <span class="count">10</span></button>
+      <button class="lib-tab" data-cat="display">Display <span class="count">12</span></button>
+      <button class="lib-tab" data-cat="server">Server <span class="count">11</span></button>
+    </div>
+    <div class="lib-grid reveal" id="libGrid"></div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <div class="section-head reveal">
+      <span class="eyebrow">Community Tools</span>
+      <h2 class="section-title">Built by the community</h2>
+      <p class="section-sub">These aren't ours — they're third-party tools we use ourselves. Worth bookmarking.</p>
+    </div>
+
+    <div class="grid-auto">
+      <div class="card tool-card reveal">
+        <div class="tool-head"><h3>MCSTACKER</h3><span class="tool-platform java">JAVA</span></div>
+        <p>The classic. Visual builders for NBT, JSON text components, target selectors, and entity summoning.</p>
+        <a class="tool-link" href="https://mcstacker.net" target="_blank" rel="noopener">mcstacker.net <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7"/><path d="M7 7h10v10"/></svg></a>
+      </div>
+      <div class="card tool-card reveal">
+        <div class="tool-head"><h3>BRIDGE. EDITOR</h3><span class="tool-platform bedrock">BEDROCK</span></div>
+        <p>The most polished visual add-on editor for Bedrock. JSON UI, manifests, behavior packs, the works.</p>
+        <a class="tool-link" href="https://bridge-core.app" target="_blank" rel="noopener">bridge-core.app <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7"/><path d="M7 7h10v10"/></svg></a>
+      </div>
+      <div class="card tool-card reveal">
+        <div class="tool-head"><h3>MINECRAFT WIKI</h3><span class="tool-platform both">BOTH</span></div>
+        <p>The reference. When the syntax has changed, check the wiki before anything else.</p>
+        <a class="tool-link" href="https://minecraft.wiki" target="_blank" rel="noopener">minecraft.wiki <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7"/><path d="M7 7h10v10"/></svg></a>
+      </div>
+      <div class="card tool-card reveal">
+        <div class="tool-head"><h3>MCBE ESSENTIALS</h3><span class="tool-platform bedrock">BEDROCK</span></div>
+        <p>Mobile-friendly NBT editors and cheat sheets when you're on your phone fixing a redstone build.</p>
+        <a class="tool-link" href="https://mcbe-essentials.github.io" target="_blank" rel="noopener">mcbe-essentials.github.io <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7"/><path d="M7 7h10v10"/></svg></a>
+      </div>
+      <div class="card tool-card reveal">
+        <div class="tool-head"><h3>BLOCKBENCH</h3><span class="tool-platform both">BOTH</span></div>
+        <p>Free 3D model editor that exports straight to Java and Bedrock. Custom mobs, custom items, custom everything.</p>
+        <a class="tool-link" href="https://blockbench.net" target="_blank" rel="noopener">blockbench.net <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7"/><path d="M7 7h10v10"/></svg></a>
+      </div>
+      <div class="card tool-card reveal">
+        <div class="tool-head"><h3>SNOWSTORM</h3><span class="tool-platform bedrock">BEDROCK</span></div>
+        <p>Browser-based particle editor for Bedrock. Live preview, export-ready JSON.</p>
+        <a class="tool-link" href="https://snowstorm.app" target="_blank" rel="noopener">snowstorm.app <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7"/><path d="M7 7h10v10"/></svg></a>
+      </div>
+      <div class="card tool-card reveal">
+        <div class="tool-head"><h3>MCPEDL</h3><span class="tool-platform bedrock">BEDROCK</span></div>
+        <p>Largest Bedrock add-on hub. Maps, mods, textures, behavior packs — all free.</p>
+        <a class="tool-link" href="https://mcpedl.com" target="_blank" rel="noopener">mcpedl.com <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7"/><path d="M7 7h10v10"/></svg></a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <div class="section-head reveal">
+      <span class="eyebrow">Pro tips</span>
+      <h2 class="section-title">Six things we wish we'd known</h2>
+      <p class="section-sub">Quick reminders that save hours when you're knee-deep in a command chain.</p>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;" class="tips-grid-resp">
+      <div class="tip-item reveal">
+        <span class="tip-num">01</span>
+        <div class="tip-body"><h4>Always test in a copy</h4><p>Copy the world before running anything destructive. <code>/fill</code> can replace 32,768 blocks in a single tick — undo is not a feature.</p></div>
+      </div>
+      <div class="tip-item reveal">
+        <span class="tip-num">02</span>
+        <div class="tip-body"><h4>Name your command blocks</h4><p>Rename them to describe what they do (Anvil → command block). Future-you will know why that chain exists.</p></div>
+      </div>
+      <div class="tip-item reveal">
+        <span class="tip-num">03</span>
+        <div class="tip-body"><h4>Start with <code>/say</code> for debugging</h4><p>Before chaining <code>/execute</code>, prove the trigger fires by sending a chat message. It's the simplest "did this run?" tool.</p></div>
+      </div>
+      <div class="tip-item reveal">
+        <span class="tip-num">04</span>
+        <div class="tip-body"><h4>Keep ticking areas small</h4><p>Bedrock allows max 10 per world. Treat them like budget — only the loop areas need them.</p></div>
+      </div>
+      <div class="tip-item reveal">
+        <span class="tip-num">05</span>
+        <div class="tip-body"><h4>Tags beat scoreboards for yes/no</h4><p>Use <code>/tag</code> for boolean states. Save scoreboards for actual numbers — counts, coins, kills.</p></div>
+      </div>
+      <div class="tip-item reveal">
+        <span class="tip-num">06</span>
+        <div class="tip-body"><h4>Chain blocks run in one tick</h4><p>Order matters: Impulse → Chain → Chain → Chain. Set conditional and unconditional carefully. They all fire on the same tick if powered.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  @media (max-width: 720px) { .tips-grid-resp { grid-template-columns: 1fr !important; } }
+</style>
+
+<footer class="app-footer">
+  <div class="container">
+    <div class="foot-grid">
+      <div class="foot-brand"><a href="index.html" class="logo"><img src="assets/favicon/favicon.png" alt="" class="logo-cube"><span>CMD<span class="accent">BLOCK</span></span></a><p>Learn Minecraft commands the way creators actually use them.</p></div>
+      <div class="foot-col"><h5>Learn</h5><a href="learn.html">Courses</a><a href="projects.html">Projects</a><a href="resources.html">Resources</a><a href="tools.html">Tools</a></div>
+      <div class="foot-col"><h5>Community</h5><a href="connect.html">Connect</a><a href="connect.html">Discord</a><a href="connect.html">GitHub</a></div>
+      <div class="foot-col"><h5>Account</h5><a href="profile.html">Profile</a><a href="mailto:hi@cmdblock.org">Contact</a><a href="#" onclick="openModal('signinModal');return false;">Sign in</a></div>
+    </div>
+    <div class="foot-bottom"><span class="pixel">CMDBLOCK © 2026</span><span>Not affiliated with Mojang or Microsoft.</span></div>
+  </div>
+</footer>
+
+<div class="modal" id="signupModal"><div class="modal-card"><button class="modal-close" onclick="closeModal('signupModal')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button><h2>CREATE ACCOUNT</h2><p class="modal-sub">Track your progress. Free, no card.</p><form id="signupForm"><input class="input" type="text" name="name" placeholder="Name" maxlength="24" required><input class="input" type="email" name="email" placeholder="you@example.com" required><div class="input-row"><input class="input" type="password" name="password" placeholder="Password" required minlength="6"><input class="input" type="password" name="confirm" placeholder="Confirm" required minlength="6"></div><div class="modal-error"></div><button class="btn btn-primary" type="submit">Create account</button></form><div class="modal-foot">Have an account? <a href="#" onclick="closeModal('signupModal');openModal('signinModal');return false;">Sign in</a></div></div></div>
+<div class="modal" id="signinModal"><div class="modal-card"><button class="modal-close" onclick="closeModal('signinModal')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button><h2>SIGN IN</h2><p class="modal-sub">Welcome back.</p><form id="signinForm"><input class="input" type="email" name="email" placeholder="you@example.com" required><input class="input" type="password" name="password" placeholder="Password" required><div class="modal-error"></div><button class="btn btn-primary" type="submit">Sign in</button></form><div class="modal-foot">New here? <a href="#" onclick="closeModal('signinModal');openModal('signupModal');return false;">Create account</a></div></div></div>
+
+<script src="scripts/cmdblock.js?v=3"></script>
+<script>
+  const COMMANDS = {
+    world:   ['time','weather','difficulty','gamerule','tickingarea','mobevent','daylock','toggledownfall','setworldspawn','locate','seed','worldborder','spawnpoint','clearspawnpoint','particle'],
+    player:  ['tp','give','effect','enchant','gamemode','xp','clear','spawnpoint','ability','inputpermission','spreadplayers','op','deop','kick'],
+    entity:  ['summon','kill','ride','event','damage','replaceitem','tag','playanimation','data','attribute'],
+    blocks:  ['setblock','fill','clone','structure','testforblock','testforblocks','loot','place'],
+    logic:   ['execute','scoreboard','function','tag','testfor','schedule','scriptevent','return','random','tellraw'],
+    display: ['title','titleraw','tellraw','say','msg','playsound','stopsound','music','particle','camera','camerashake','dialogue','fog','hud'],
+    server:  ['op','deop','kick','allowlist','list','setmaxplayers','changesetting','reload','help','me','save-all'],
+  };
+  const libGrid = document.getElementById('libGrid');
+  const libTabs = document.getElementById('libTabs');
+  function renderLib(cat) {
+    const names = cat === 'all' ? [...new Set(Object.values(COMMANDS).flat())] : (COMMANDS[cat] || []);
+    libGrid.innerHTML = names.map(n => `
+      <div class="cmd-row">
+        <span class="cmd-name"><span class="slash">/</span>${n}</span>
+        <button class="cmd-copy" aria-label="Copy /${n}" data-cmd="/${n}">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
+        </button>
+      </div>`).join('');
+  }
+  renderLib('all');
+  libTabs.addEventListener('click', (e) => {
+    const btn = e.target.closest('.lib-tab');
+    if (!btn) return;
+    libTabs.querySelectorAll('.lib-tab').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    renderLib(btn.dataset.cat);
+  });
+  libGrid.addEventListener('click', (e) => {
+    const btn = e.target.closest('.cmd-copy');
+    if (!btn) return;
+    navigator.clipboard?.writeText(btn.dataset.cmd).catch(() => {});
+    const row = btn.closest('.cmd-row');
+    row.classList.add('copied');
+    btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>';
+    setTimeout(() => {
+      row.classList.remove('copied');
+      btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>';
+    }, 1400);
+  });
+
+  // Scroll to #commands if URL has it
+  if (location.hash === '#commands') {
+    requestAnimationFrame(() => document.getElementById('commands')?.scrollIntoView({ behavior: 'smooth' }));
+  }
+</script>
+</body>
+</html>

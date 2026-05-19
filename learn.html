@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Learn — CMDBLOCK</title>
+<meta name="description" content="Pick an edition. Follow the path from Iron to Netherite. 46 lessons, all free.">
+<link rel="icon" type="image/png" href="assets/favicon/favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Silkscreen:wght@400;700&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css?v=3">
+</head>
+<body>
+
+<div class="orb orb-1"></div>
+<div class="orb orb-2"></div>
+<div class="orb orb-3"></div>
+
+<nav class="app-nav">
+  <div class="container">
+    <a href="index.html" class="logo">
+      <img src="assets/favicon/favicon.png" alt="" class="logo-cube">
+      <span>CMD<span class="accent">BLOCK</span></span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="learn.html">Learn</a></li>
+      <li><a href="projects.html">Projects</a></li>
+      <li><a href="resources.html">Resources</a></li>
+      <li><a href="tools.html">Tools</a></li>
+      <li><a href="connect.html">Connect</a></li>
+    </ul>
+    <div class="nav-actions">
+      <a href="#" class="nav-cta desktop-only" data-account-cta>Sign Up</a>
+      <button class="mobile-toggle" id="menuBtn" aria-label="Menu"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="18" y2="18"/></svg></button>
+    </div>
+  </div>
+</nav>
+<div class="mobile-nav" id="mobileNav">
+  <a href="learn.html">Learn</a><a href="projects.html">Projects</a><a href="resources.html">Resources</a><a href="tools.html">Tools</a><a href="connect.html">Connect</a>
+  <a href="#" class="nav-cta" data-account-cta>Sign Up</a>
+</div>
+
+<section class="page-hero">
+  <div class="hero-grid"></div>
+  <div class="hero-content">
+    <span class="pill"><span class="pill-badge">46</span> lessons. One clear path.</span>
+    <h1 style="margin-top:24px;">Things to <span class="green">know.</span></h1>
+    <p>From your first slash to a working systems game loop. Pick an edition — every course adapts.</p>
+  </div>
+</section>
+
+<section class="section tight">
+  <div class="container" style="text-align:center;">
+    <div class="edition-toggle reveal" id="editionToggle" role="tablist">
+      <button class="active" data-edition="bedrock" role="tab"><img src="assets/icons/bedrock.png" alt=""> BEDROCK</button>
+      <button data-edition="java" role="tab"><img src="assets/icons/Grass_Block.png" alt=""> JAVA</button>
+    </div>
+  </div>
+</section>
+
+<section class="section" style="padding-top:0;">
+  <div class="container">
+    <div class="grid-auto" id="courseGrid"></div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <div class="section-head reveal">
+      <span class="eyebrow">Your progress</span>
+      <h2 class="section-title">Where you are on the path</h2>
+      <p class="section-sub">Bedrock: 12 (iron) → 19 (emerald) → 13 (diamond) = 44 lessons. Java adds a Netherite bonus.</p>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:12px;" id="progressRails"></div>
+  </div>
+</section>
+
+<footer class="app-footer">
+  <div class="container">
+    <div class="foot-grid">
+      <div class="foot-brand">
+        <a href="index.html" class="logo"><img src="assets/favicon/favicon.png" alt="" class="logo-cube"><span>CMD<span class="accent">BLOCK</span></span></a>
+        <p>Learn Minecraft commands the way creators actually use them.</p>
+      </div>
+      <div class="foot-col"><h5>Learn</h5><a href="learn.html">Courses</a><a href="projects.html">Projects</a><a href="resources.html">Resources</a><a href="tools.html">Tools</a></div>
+      <div class="foot-col"><h5>Community</h5><a href="connect.html">Connect</a><a href="connect.html">Discord</a><a href="connect.html">GitHub</a></div>
+      <div class="foot-col"><h5>Account</h5><a href="profile.html">Profile</a><a href="mailto:hi@cmdblock.org">Contact</a><a href="#" onclick="openModal('signinModal');return false;">Sign in</a></div>
+    </div>
+    <div class="foot-bottom"><span class="pixel">CMDBLOCK © 2026</span><span>Not affiliated with Mojang or Microsoft. · <a href="mailto:hi@cmdblock.org" style="color:var(--cmd-aqua);text-decoration:none;">hi@cmdblock.org</a></span></div>
+  </div>
+</footer>
+
+<div class="modal" id="signupModal"><div class="modal-card"><button class="modal-close" onclick="closeModal('signupModal')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button><h2>CREATE ACCOUNT</h2><p class="modal-sub">Track your progress. Free, no card.</p><form id="signupForm"><input class="input" type="text" name="name" placeholder="Name" maxlength="24" required><input class="input" type="email" name="email" placeholder="you@example.com" required><div class="input-row"><input class="input" type="password" name="password" placeholder="Password" required minlength="6"><input class="input" type="password" name="confirm" placeholder="Confirm" required minlength="6"></div><div class="modal-error"></div><button class="btn btn-primary" type="submit">Create account</button></form><div class="modal-foot">Have an account? <a href="#" onclick="closeModal('signupModal');openModal('signinModal');return false;">Sign in</a></div></div></div>
+<div class="modal" id="signinModal"><div class="modal-card"><button class="modal-close" onclick="closeModal('signinModal')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button><h2>SIGN IN</h2><p class="modal-sub">Welcome back.</p><form id="signinForm"><input class="input" type="email" name="email" placeholder="you@example.com" required><input class="input" type="password" name="password" placeholder="Password" required><div class="modal-error"></div><button class="btn btn-primary" type="submit">Sign in</button></form><div class="modal-foot">New here? <a href="#" onclick="closeModal('signinModal');openModal('signupModal');return false;">Create account</a></div></div></div>
+
+<script src="scripts/cmdblock.js?v=3"></script>
+<script>
+  const COURSES = {
+    bedrock: [
+      { id: 'iron', name: 'IRON COURSE', tier: 'BASIC', desc: 'Run your first commands. Target players, set time and weather, give items, teleport, place blocks.', count: 12, time: '~4 hrs', file: 'iron-course.html', icon: 'iron-removebg-preview.png' },
+      { id: 'emerald', name: 'EMERALD COURSE', tier: 'INTERMEDIATE', desc: 'Coins, zones, timers, game loops that run without you. Real systems.', count: 19, time: '~8 hrs', file: 'emerald-course.html', icon: 'emerald-removebg-preview.png' },
+      { id: 'diamond', name: 'DIAMOND COURSE', tier: 'EXPERT', desc: 'Make your map look and sound real. Titles, sound, particles, camera, dialogue, behavior packs, polish.', count: 13, time: '~10 hrs', file: 'diamond-course.html', icon: 'diamond-removebg-preview.png' },
+    ],
+    java: [
+      { id: 'iron', name: 'IRON COURSE', tier: 'BASIC', desc: 'Run your first commands. Target players, set time and weather, give items, teleport, place blocks.', count: 12, time: '~4 hrs', file: 'java-iron-course.html', icon: 'iron-removebg-preview.png' },
+      { id: 'emerald', name: 'EMERALD COURSE', tier: 'INTERMEDIATE', desc: 'Coins, zones, timers, game loops that run without you. Real systems.', count: 19, time: '~8 hrs', file: 'java-emerald-course.html', icon: 'emerald-removebg-preview.png' },
+      { id: 'diamond', name: 'DIAMOND COURSE', tier: 'EXPERT', desc: 'Make your map look and sound real. Titles, sound, particles, camera, dialogue, polish.', count: 13, time: '~10 hrs', file: 'java-diamond-course.html', icon: 'diamond-removebg-preview.png' },
+      { id: 'netherite', name: 'NETHERITE COURSE', tier: 'BONUS', desc: 'Diagnose lag, find broken farms, read any world like code. F3, pie chart, debug toolkit.', count: 8, time: '~5 hrs', file: 'java-netherite-course.html', icon: 'netherite_icon.png', isNew: true, wip: true },
+    ],
+  };
+
+  const courseGrid = document.getElementById('courseGrid');
+  const progressRails = document.getElementById('progressRails');
+  const editionToggle = document.getElementById('editionToggle');
+
+  function renderCourses(edition) {
+    const progress = cmdblock.getProgress();
+    courseGrid.innerHTML = COURSES[edition].map(c => {
+      const key = `${edition}-${c.id}`;
+      const done = progress[key]?.completed || 0;
+      const isComplete = done >= c.count;
+      const tags = [];
+      if (isComplete) tags.push('<span class="card-tag completed">✓ COMPLETED</span>');
+      if (c.isNew && !isComplete) tags.push('<span class="card-tag new">NEW</span>');
+      if (c.wip) tags.push(`<span class="card-tag wip" style="top:${isComplete || c.isNew ? '46px' : '18px'}">WIP</span>`);
+      return `
+        <a href="${c.file}" class="card course-card ${c.id} ${isComplete ? 'is-complete' : ''}">
+          <div class="course-card-art"><img src="assets/icons/${c.icon}" alt="">${isComplete ? '<div class="course-complete-overlay"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>' : ''}</div>
+          ${tags.join('')}
+          <div class="course-card-body">
+            <div class="course-card-tier">${c.tier}</div>
+            <h3>${c.name}</h3>
+            <p>${c.desc}</p>
+            <div class="course-card-meta">
+              <span><span class="lesson-count">${done}/${c.count}</span> lessons</span>
+              <span>${isComplete ? 'Review' : c.time}</span>
+            </div>
+          </div>
+        </a>`;
+    }).join('');
+  }
+
+  function renderProgress(edition) {
+    const courses = COURSES[edition];
+    const progress = cmdblock.getProgress();
+    progressRails.innerHTML = courses.map(c => {
+      const key = `${edition}-${c.id}`;
+      const done = progress[key]?.completed || 0;
+      const pct = c.count ? Math.round((done / c.count) * 100) : 0;
+      const isComplete = done >= c.count;
+      return `
+        <div class="progress-rail-card ${isComplete ? 'is-complete' : ''}">
+          <div class="pr-icon">
+            <img src="assets/icons/${c.icon}" alt="">
+            ${isComplete ? '<div class="pr-check"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 8 7 12 13 4"/></svg></div>' : ''}
+          </div>
+          <div class="pr-info">
+            <div class="pr-name">${c.name} ${isComplete ? '<span style="color:var(--cmd-green);font-size:0.6rem;margin-left:6px;">✓ COMPLETED</span>' : ''}</div>
+            <div class="pr-text">${isComplete ? `Mastered all ${c.count} lessons` : `${done} of ${c.count} lessons · ${pct}%`}</div>
+            <div class="pr-bar"><div class="pr-fill" style="width:${pct}%"></div></div>
+          </div>
+          <a href="${c.file}" class="btn ${isComplete ? 'btn-ghost' : (done > 0 ? 'btn-primary' : 'btn-ghost')} btn-sm">${isComplete ? 'Review' : (done > 0 ? 'Continue' : 'Start')}</a>
+        </div>`;
+    }).join('');
+  }
+
+  function setEdition(edition) {
+    editionToggle.querySelectorAll('button').forEach(b => b.classList.toggle('active', b.dataset.edition === edition));
+    renderCourses(edition);
+    renderProgress(edition);
+    cmdblock.setPrefs({ ...cmdblock.getPrefs(), edition });
+  }
+
+  editionToggle.addEventListener('click', (e) => {
+    const btn = e.target.closest('button');
+    if (btn) setEdition(btn.dataset.edition);
+  });
+
+  setEdition(cmdblock.getPrefs().edition || 'bedrock');
+</script>
+</body>
+</html>

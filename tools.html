@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tools — CMDBLOCK</title>
+<meta name="description" content="Build, validate and dry-run Minecraft commands in your browser.">
+<link rel="icon" type="image/png" href="assets/favicon/favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Silkscreen:wght@400;700&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css?v=3">
+<style>
+  .tool-section { padding: 60px 24px; }
+  .tool-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 32px;
+    position: relative; overflow: hidden;
+  }
+  .tool-card-head {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 24px; flex-wrap: wrap; gap: 12px;
+    padding-bottom: 20px; border-bottom: 1px solid var(--border);
+  }
+  .tool-card-head h3 {
+    font-family: 'Silkscreen', monospace;
+    font-size: 0.95rem; letter-spacing: 1px;
+    color: var(--text);
+  }
+  .tool-meta {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.74rem;
+    color: var(--text-faint);
+  }
+  .wip-mini {
+    font-family: 'Silkscreen', monospace;
+    font-size: 0.55rem; letter-spacing: 1.2px;
+    color: var(--gold);
+    background: rgba(252,219,5,0.08);
+    border: 1px solid rgba(252,219,5,0.2);
+    padding: 3px 8px;
+    border-radius: 4px;
+  }
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 14px 0; }
+  .chip {
+    padding: 7px 12px;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.78rem;
+    color: var(--text-dim);
+    cursor: pointer;
+    transition: all 0.18s;
+  }
+  .chip:hover { color: var(--text); border-color: var(--border-strong); }
+  .chip.active { background: rgba(85,255,85,0.08); border-color: rgba(85,255,85,0.3); color: var(--cmd-green); }
+  .output-box {
+    margin-top: 16px;
+    padding: 14px 18px;
+    background: rgba(0,0,0,0.3);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.86rem;
+    color: var(--text);
+    min-height: 50px;
+    display: flex; align-items: center; justify-content: space-between; gap: 14px;
+    word-break: break-all;
+  }
+  .output-box .out-text { flex: 1; min-width: 0; }
+  .output-box .copy-btn { flex-shrink: 0; }
+  .field-row { display: flex; gap: 10px; margin-bottom: 10px; }
+  .field-row .input { flex: 1; }
+  @media (max-width: 540px) { .field-row { flex-direction: column; } }
+  .label {
+    display: block;
+    font-family: 'Silkscreen', monospace;
+    font-size: 0.62rem; letter-spacing: 1.2px;
+    color: var(--text-dim);
+    margin-bottom: 6px;
+  }
+  .sandbox-log {
+    background: rgba(0,0,0,0.4);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 18px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.85rem;
+    color: var(--text);
+    max-height: 200px; overflow-y: auto;
+    margin-bottom: 12px;
+  }
+  .sandbox-log .log-line { padding: 2px 0; }
+  .sandbox-log .log-line.in::before { content: '> '; color: var(--cmd-green); }
+  .sandbox-log .log-line.out { color: var(--text-dim); padding-left: 16px; }
+  .sandbox-log .log-line.err { color: var(--cmd-red); padding-left: 16px; }
+  .checker-result {
+    margin-top: 14px;
+    padding: 14px 18px;
+    border-radius: 10px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.86rem;
+  }
+  .checker-result.valid { background: rgba(85,255,85,0.06); border: 1px solid rgba(85,255,85,0.25); color: var(--cmd-green); }
+  .checker-result.error { background: rgba(255,92,92,0.06); border: 1px solid rgba(255,92,92,0.25); color: var(--cmd-red); }
+  .checker-result.empty { background: var(--bg-card); border: 1px solid var(--border); color: var(--text-dim); }
+</style>
+</head>
+<body>
+
+<div class="orb orb-1"></div>
+<div class="orb orb-2"></div>
+<div class="orb orb-3"></div>
+
+<nav class="app-nav">
+  <div class="container">
+    <a href="index.html" class="logo"><img src="assets/favicon/favicon.png" alt="" class="logo-cube"><span>CMD<span class="accent">BLOCK</span></span></a>
+    <ul class="nav-links">
+      <li><a href="learn.html">Learn</a></li><li><a href="projects.html">Projects</a></li><li><a href="resources.html">Resources</a></li><li><a href="tools.html">Tools</a></li><li><a href="connect.html">Connect</a></li>
+    </ul>
+    <div class="nav-actions">
+      <a href="#" class="nav-cta desktop-only" data-account-cta>Sign Up</a>
+      <button class="mobile-toggle" id="menuBtn" aria-label="Menu"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="18" y2="18"/></svg></button>
+    </div>
+  </div>
+</nav>
+<div class="mobile-nav" id="mobileNav">
+  <a href="learn.html">Learn</a><a href="projects.html">Projects</a><a href="resources.html">Resources</a><a href="tools.html">Tools</a><a href="connect.html">Connect</a>
+  <a href="#" class="nav-cta" data-account-cta>Sign Up</a>
+</div>
+
+<section class="page-hero">
+  <div class="hero-grid"></div>
+  <div class="hero-content">
+    <span class="pill"><span class="pill-badge">4</span> in-browser command tools</span>
+    <h1 style="margin-top:24px;">Command <span class="green">tools.</span></h1>
+    <p>Build, validate, and dry-run commands without ever leaving the tab. Bedrock and Java both supported.</p>
+  </div>
+</section>
+
+<section class="section tight">
+  <div class="container" style="text-align:center;">
+    <div class="edition-toggle reveal" id="editionToggle">
+      <button class="active" data-edition="bedrock"><img src="assets/icons/bedrock.png" alt=""> BEDROCK</button>
+      <button data-edition="java"><img src="assets/icons/Grass_Block.png" alt=""> JAVA</button>
+    </div>
+  </div>
+</section>
+
+<!-- COMMAND GENERATOR -->
+<section class="section" style="padding-top:0;">
+  <div class="container">
+    <div class="section-head reveal">
+      <span class="eyebrow">Tool 01</span>
+      <h2 class="section-title">Command generator</h2>
+    </div>
+    <div class="tool-card reveal">
+      <div class="tool-card-head">
+        <h3>BUILD A COMMAND</h3>
+        <span class="tool-meta">Edition: <span id="genEdition" style="color:var(--cmd-green);">BEDROCK</span></span>
+      </div>
+      <span class="label">Command type</span>
+      <div class="chips" id="genChips">
+        <button class="chip active" data-cmd="give">/give</button>
+        <button class="chip" data-cmd="tp">/tp</button>
+        <button class="chip" data-cmd="effect">/effect</button>
+        <button class="chip" data-cmd="summon">/summon</button>
+        <button class="chip" data-cmd="setblock">/setblock</button>
+        <button class="chip" data-cmd="title">/title</button>
+      </div>
+      <div id="genFields"></div>
+      <div class="output-box">
+        <span class="out-text" id="genOutput">/give @p diamond 1</span>
+        <button class="btn btn-ghost btn-sm" id="genCopy">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
+          Copy
+        </button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TARGET SELECTOR -->
+<section class="section" style="padding-top:0;">
+  <div class="container">
+    <div class="section-head reveal">
+      <span class="eyebrow">Tool 02</span>
+      <h2 class="section-title">Target selector generator</h2>
+    </div>
+    <div class="tool-card reveal">
+      <div class="tool-card-head">
+        <h3>BUILD A SELECTOR</h3>
+        <span class="tool-meta">Result: <span id="selEditionTag" style="color:var(--cmd-green);">BEDROCK</span></span>
+      </div>
+      <span class="label">Base selector</span>
+      <div class="chips" id="selBaseChips">
+        <button class="chip active" data-sel="@p">@p — nearest</button>
+        <button class="chip" data-sel="@a">@a — all players</button>
+        <button class="chip" data-sel="@e">@e — all entities</button>
+        <button class="chip" data-sel="@s">@s — self</button>
+        <button class="chip" data-sel="@r">@r — random</button>
+        <button class="chip" data-sel="@n">@n — nearest entity</button>
+      </div>
+      <div class="field-row">
+        <input class="input input-mono" id="selType" placeholder="type=...">
+        <input class="input input-mono" id="selName" placeholder="name=...">
+      </div>
+      <div class="field-row">
+        <input class="input input-mono" id="selTag" placeholder="tag=...">
+        <input class="input input-mono" id="selFamily" placeholder="family=... (Bedrock only)">
+      </div>
+      <div class="output-box">
+        <span class="out-text" id="selOutput">@p</span>
+        <button class="btn btn-ghost btn-sm" id="selCopy">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
+          Copy
+        </button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SYNTAX CHECKER -->
+<section class="section" style="padding-top:0;">
+  <div class="container">
+    <div class="section-head reveal">
+      <span class="eyebrow">Tool 03</span>
+      <h2 class="section-title">Syntax checker <span class="wip-mini" style="margin-left:8px;">RESULTS MAY VARY</span></h2>
+    </div>
+    <div class="tool-card reveal">
+      <div class="tool-card-head"><h3>VALIDATE A COMMAND</h3></div>
+      <span class="label">Try an example</span>
+      <div class="chips">
+        <button class="chip" onclick="setChecker('/give @p diamond_sword 1')">/give @p diamond_sword 1</button>
+        <button class="chip" onclick="setChecker('/summon zombie ~ ~ ~')">/summon zombie ~ ~ ~</button>
+        <button class="chip" onclick="setChecker('/execute as @a run say hi')">/execute as @a run say hi</button>
+        <button class="chip" onclick="setChecker('/tp @s 0 64 0')">/tp @s 0 64 0</button>
+      </div>
+      <input class="input input-mono" id="checkerInput" placeholder="Paste a command starting with /">
+      <div class="checker-result empty" id="checkerResult">Type or paste a command to check it.</div>
+    </div>
+  </div>
+</section>
+
+<!-- COMMAND SANDBOX -->
+<section class="section" style="padding-top:0;">
+  <div class="container">
+    <div class="section-head reveal">
+      <span class="eyebrow">Tool 04</span>
+      <h2 class="section-title">Command sandbox <span class="wip-mini" style="margin-left:8px;">WIP</span></h2>
+    </div>
+    <div class="tool-card reveal">
+      <div class="tool-card-head">
+        <h3>TRY COMMANDS SAFELY</h3>
+        <span class="tool-meta">Mock edition: <span id="sandboxEdition" style="color:var(--cmd-green);">BEDROCK</span></span>
+      </div>
+      <div class="terminal" style="margin: 0 0 16px 0;">
+        <div class="terminal-bar">
+          <div class="t-dots"><span class="t-dot r"></span><span class="t-dot y"></span><span class="t-dot g"></span></div>
+          <span class="t-title">cmdblock-sandbox</span>
+          <div style="width:54px;"></div>
+        </div>
+        <div class="terminal-body sandbox-log" id="sandboxLog">
+          <div class="log-line out">Welcome to the sandbox. Commands are simulated.</div>
+          <div class="log-line out">Try typing /say hello or use a chip below.</div>
+        </div>
+      </div>
+      <span class="label">Quick insert</span>
+      <div class="chips">
+        <button class="chip" onclick="insertSandbox('/give ')">/give</button>
+        <button class="chip" onclick="insertSandbox('/tp ')">/tp</button>
+        <button class="chip" onclick="insertSandbox('/summon ')">/summon</button>
+        <button class="chip" onclick="insertSandbox('/effect ')">/effect</button>
+        <button class="chip" onclick="insertSandbox('/fill ')">/fill</button>
+        <button class="chip" onclick="insertSandbox('/gamemode ')">/gamemode</button>
+      </div>
+      <div class="field-row">
+        <input class="input input-mono" id="sandboxInput" placeholder="/say hello" onkeydown="if(event.key==='Enter')runSandbox()">
+        <button class="btn btn-primary" onclick="runSandbox()">Run</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer class="app-footer">
+  <div class="container">
+    <div class="foot-grid">
+      <div class="foot-brand"><a href="index.html" class="logo"><img src="assets/favicon/favicon.png" alt="" class="logo-cube"><span>CMD<span class="accent">BLOCK</span></span></a><p>Learn Minecraft commands the way creators actually use them.</p></div>
+      <div class="foot-col"><h5>Learn</h5><a href="learn.html">Courses</a><a href="projects.html">Projects</a><a href="resources.html">Resources</a><a href="tools.html">Tools</a></div>
+      <div class="foot-col"><h5>Community</h5><a href="connect.html">Connect</a><a href="connect.html">Discord</a><a href="connect.html">GitHub</a></div>
+      <div class="foot-col"><h5>Account</h5><a href="profile.html">Profile</a><a href="mailto:hi@cmdblock.org">Contact</a><a href="#" onclick="openModal('signinModal');return false;">Sign in</a></div>
+    </div>
+    <div class="foot-bottom"><span class="pixel">CMDBLOCK © 2026</span><span>Not affiliated with Mojang or Microsoft.</span></div>
+  </div>
+</footer>
+
+<div class="modal" id="signupModal"><div class="modal-card"><button class="modal-close" onclick="closeModal('signupModal')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button><h2>CREATE ACCOUNT</h2><p class="modal-sub">Track your progress. Free, no card.</p><form id="signupForm"><input class="input" type="text" name="name" placeholder="Name" maxlength="24" required><input class="input" type="email" name="email" placeholder="you@example.com" required><div class="input-row"><input class="input" type="password" name="password" placeholder="Password" required minlength="6"><input class="input" type="password" name="confirm" placeholder="Confirm" required minlength="6"></div><div class="modal-error"></div><button class="btn btn-primary" type="submit">Create account</button></form><div class="modal-foot">Have an account? <a href="#" onclick="closeModal('signupModal');openModal('signinModal');return false;">Sign in</a></div></div></div>
+<div class="modal" id="signinModal"><div class="modal-card"><button class="modal-close" onclick="closeModal('signinModal')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button><h2>SIGN IN</h2><p class="modal-sub">Welcome back.</p><form id="signinForm"><input class="input" type="email" name="email" placeholder="you@example.com" required><input class="input" type="password" name="password" placeholder="Password" required><div class="modal-error"></div><button class="btn btn-primary" type="submit">Sign in</button></form><div class="modal-foot">New here? <a href="#" onclick="closeModal('signinModal');openModal('signupModal');return false;">Create account</a></div></div></div>
+
+<script src="scripts/cmdblock.js?v=3"></script>
+<script>
+  let edition = cmdblock.getPrefs().edition || 'bedrock';
+  const editionToggle = document.getElementById('editionToggle');
+  function setEdition(e) {
+    edition = e;
+    editionToggle.querySelectorAll('button').forEach(b => b.classList.toggle('active', b.dataset.edition === e));
+    cmdblock.setPrefs({ ...cmdblock.getPrefs(), edition: e });
+    document.getElementById('genEdition').textContent = e.toUpperCase();
+    document.getElementById('selEditionTag').textContent = e.toUpperCase();
+    document.getElementById('sandboxEdition').textContent = e.toUpperCase();
+    renderGenFields(currentGen);
+    updateGenOutput();
+    updateSelOutput();
+  }
+  editionToggle.addEventListener('click', (e) => {
+    const btn = e.target.closest('button');
+    if (btn) setEdition(btn.dataset.edition);
+  });
+
+  // ── Command generator ────────────────────────────────
+  let currentGen = 'give';
+  const GEN_FIELDS = {
+    give:     [['target','@p'],['item','diamond'],['amount','1']],
+    tp:       [['target','@p'],['x','0'],['y','64'],['z','0']],
+    effect:   [['target','@a'],['effect','speed'],['duration','30'],['amplifier','1']],
+    summon:   [['entity','zombie'],['x','~'],['y','~'],['z','~']],
+    setblock: [['x','~'],['y','~'],['z','~'],['block','redstone_block']],
+    title:    [['target','@a'],['type','title'],['text','Welcome']],
+  };
+  const GEN_BUILDERS = {
+    give:     ([t,i,a]) => `/give ${t} ${i} ${a}`,
+    tp:       ([t,x,y,z]) => `/tp ${t} ${x} ${y} ${z}`,
+    effect:   ([t,fx,d,amp]) => edition === 'java' ? `/effect give ${t} ${fx} ${d} ${amp}` : `/effect ${t} ${fx} ${d} ${amp}`,
+    summon:   ([e,x,y,z]) => `/summon ${e} ${x} ${y} ${z}`,
+    setblock: ([x,y,z,b]) => `/setblock ${x} ${y} ${z} ${b}`,
+    title:    ([t,type,text]) => edition === 'java' ? `/title ${t} ${type} {"text":"${text}"}` : `/title ${t} ${type} ${text}`,
+  };
+
+  function renderGenFields(cmd) {
+    const fields = GEN_FIELDS[cmd];
+    document.getElementById('genFields').innerHTML = `
+      <span class="label">Arguments</span>
+      <div class="field-row" style="flex-wrap:wrap;">
+        ${fields.map(([n,v]) => `<input class="input input-mono" data-arg="${n}" placeholder="${n}" value="${v}" style="min-width:120px;">`).join('')}
+      </div>`;
+    document.getElementById('genFields').querySelectorAll('input').forEach(i => i.addEventListener('input', updateGenOutput));
+  }
+  function updateGenOutput() {
+    const inputs = document.getElementById('genFields').querySelectorAll('input');
+    const args = [...inputs].map(i => i.value || i.placeholder);
+    document.getElementById('genOutput').textContent = GEN_BUILDERS[currentGen](args);
+  }
+  document.getElementById('genChips').addEventListener('click', (e) => {
+    const c = e.target.closest('.chip');
+    if (!c) return;
+    document.getElementById('genChips').querySelectorAll('.chip').forEach(b => b.classList.remove('active'));
+    c.classList.add('active');
+    currentGen = c.dataset.cmd;
+    renderGenFields(currentGen);
+    updateGenOutput();
+  });
+  renderGenFields(currentGen);
+  document.getElementById('genCopy').addEventListener('click', (e) => {
+    navigator.clipboard?.writeText(document.getElementById('genOutput').textContent);
+    e.currentTarget.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Copied';
+    setTimeout(() => e.currentTarget.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg> Copy', 1400);
+  });
+
+  // ── Selector ─────────────────────────────────────────
+  let selBase = '@p';
+  document.getElementById('selBaseChips').addEventListener('click', (e) => {
+    const c = e.target.closest('.chip');
+    if (!c) return;
+    document.getElementById('selBaseChips').querySelectorAll('.chip').forEach(b => b.classList.remove('active'));
+    c.classList.add('active');
+    selBase = c.dataset.sel;
+    updateSelOutput();
+  });
+  ['selType','selName','selTag','selFamily'].forEach(id => document.getElementById(id).addEventListener('input', updateSelOutput));
+  function updateSelOutput() {
+    const args = [];
+    const type = document.getElementById('selType').value.trim();
+    const name = document.getElementById('selName').value.trim();
+    const tag  = document.getElementById('selTag').value.trim();
+    const fam  = document.getElementById('selFamily').value.trim();
+    if (type) args.push(`type=${type}`);
+    if (name) args.push(`name=${name}`);
+    if (tag)  args.push(`tag=${tag}`);
+    if (fam && edition === 'bedrock') args.push(`family=${fam}`);
+    document.getElementById('selOutput').textContent = args.length ? `${selBase}[${args.join(',')}]` : selBase;
+  }
+  document.getElementById('selCopy').addEventListener('click', (e) => {
+    navigator.clipboard?.writeText(document.getElementById('selOutput').textContent);
+    e.currentTarget.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Copied';
+    setTimeout(() => e.currentTarget.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg> Copy', 1400);
+  });
+
+  // ── Syntax checker ───────────────────────────────────
+  function setChecker(v) { const i = document.getElementById('checkerInput'); i.value = v; runChecker(); }
+  function runChecker() {
+    const v = document.getElementById('checkerInput').value.trim();
+    const r = document.getElementById('checkerResult');
+    if (!v) { r.className = 'checker-result empty'; r.textContent = 'Type or paste a command to check it.'; return; }
+    if (!v.startsWith('/')) { r.className = 'checker-result error'; r.textContent = 'Commands must start with a /'; return; }
+    const parts = v.slice(1).split(/\s+/);
+    const cmd = parts[0];
+    if (!/^[a-z][a-z_-]*$/i.test(cmd)) { r.className = 'checker-result error'; r.textContent = `Invalid command name: "${cmd}"`; return; }
+    const known = ['give','tp','effect','summon','setblock','title','say','tell','msg','execute','scoreboard','tag','fill','clone','gamemode','time','weather','difficulty','gamerule','teleport','kill','xp','enchant','playsound','particle','tellraw','data','tickingarea','function','schedule','op','deop','kick','help','me','list','reload','locate','spawnpoint','spreadplayers','clear'];
+    if (!known.includes(cmd)) { r.className = 'checker-result error'; r.textContent = `Unknown command: /${cmd}`; return; }
+    r.className = 'checker-result valid';
+    r.textContent = `✓ Valid syntax — /${cmd} parsed with ${parts.length - 1} argument${parts.length === 2 ? '' : 's'}`;
+  }
+  document.getElementById('checkerInput').addEventListener('input', runChecker);
+
+  // ── Sandbox ──────────────────────────────────────────
+  function insertSandbox(s) { const i = document.getElementById('sandboxInput'); i.value = s; i.focus(); }
+  function appendSandbox(cls, text) {
+    const log = document.getElementById('sandboxLog');
+    const line = document.createElement('div');
+    line.className = 'log-line ' + cls;
+    line.textContent = text;
+    log.appendChild(line);
+    log.scrollTop = log.scrollHeight;
+  }
+  function runSandbox() {
+    const i = document.getElementById('sandboxInput');
+    const v = i.value.trim();
+    if (!v) return;
+    appendSandbox('in', v);
+    if (!v.startsWith('/')) { appendSandbox('err', 'Commands must start with /'); i.value=''; return; }
+    const cmd = v.slice(1).split(/\s+/)[0];
+    if (cmd === 'say') appendSandbox('out', `[Server] ${v.slice(5)}`);
+    else if (cmd === 'give') appendSandbox('out', `Gave item to player`);
+    else if (cmd === 'tp' || cmd === 'teleport') appendSandbox('out', `Teleported player`);
+    else if (cmd === 'summon') appendSandbox('out', `Summoned entity`);
+    else if (cmd === 'effect') appendSandbox('out', `Applied effect`);
+    else if (cmd === 'fill') appendSandbox('out', `Filled blocks`);
+    else if (cmd === 'gamemode') appendSandbox('out', `Set gamemode`);
+    else appendSandbox('out', `Executed /${cmd}`);
+    i.value = '';
+  }
+
+  setEdition(edition);
+</script>
+</body>
+</html>

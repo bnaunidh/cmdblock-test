@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson — CMDBLOCK</title>
+<link rel="icon" type="image/png" href="assets/favicon/favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Silkscreen:wght@400;700&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css?v=3">
+</head>
+<body>
+
+<nav class="app-nav">
+  <div class="container">
+    <a href="index.html" class="logo"><img src="assets/favicon/favicon.png" alt="" class="logo-cube"><span>CMD<span class="accent">BLOCK</span></span></a>
+    <ul class="nav-links">
+      <li><a href="learn.html">Learn</a></li><li><a href="projects.html">Projects</a></li><li><a href="resources.html">Resources</a></li><li><a href="tools.html">Tools</a></li><li><a href="connect.html">Connect</a></li>
+    </ul>
+    <div class="nav-actions">
+      <a href="#" class="nav-cta desktop-only" data-account-cta>Sign Up</a>
+      <button class="mobile-toggle" id="menuBtn" aria-label="Menu"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="18" y2="18"/></svg></button>
+    </div>
+  </div>
+</nav>
+<div class="mobile-nav" id="mobileNav">
+  <a href="learn.html">Learn</a><a href="projects.html">Projects</a><a href="resources.html">Resources</a><a href="tools.html">Tools</a><a href="connect.html">Connect</a>
+  <a href="#" class="nav-cta" data-account-cta>Sign Up</a>
+</div>
+
+<div class="lesson-shell">
+  <aside class="lesson-sidebar" id="lessonSidebar"></aside>
+  <main class="lesson-main" id="lessonMain"></main>
+</div>
+
+<div class="modal" id="signupModal"><div class="modal-card"><button class="modal-close" onclick="closeModal('signupModal')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button><h2>CREATE ACCOUNT</h2><p class="modal-sub">Track your progress. Free, no card.</p><form id="signupForm"><input class="input" type="text" name="name" placeholder="Name" maxlength="24" required><input class="input" type="email" name="email" placeholder="you@example.com" required><div class="input-row"><input class="input" type="password" name="password" placeholder="Password" required minlength="6"><input class="input" type="password" name="confirm" placeholder="Confirm" required minlength="6"></div><div class="modal-error"></div><button class="btn btn-primary" type="submit">Create account</button></form><div class="modal-foot">Have an account? <a href="#" onclick="closeModal('signupModal');openModal('signinModal');return false;">Sign in</a></div></div></div>
+<div class="modal" id="signinModal"><div class="modal-card"><button class="modal-close" onclick="closeModal('signinModal')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button><h2>SIGN IN</h2><p class="modal-sub">Welcome back.</p><form id="signinForm"><input class="input" type="email" name="email" placeholder="you@example.com" required><input class="input" type="password" name="password" placeholder="Password" required><div class="modal-error"></div><button class="btn btn-primary" type="submit">Sign in</button></form><div class="modal-foot">New here? <a href="#" onclick="closeModal('signinModal');openModal('signupModal');return false;">Create account</a></div></div></div>
+
+<script src="scripts/lessons.js"></script>
+<script src="scripts/cmdblock.js?v=3"></script>
+<script>
+(function () {
+  const params = new URLSearchParams(location.search);
+  const courseId = params.get('course') || document.body.dataset.course || 'bedrock-iron';
+  const course = LESSONS[courseId];
+  if (!course) { document.getElementById('lessonMain').innerHTML = '<div style="padding:60px 24px;text-align:center;"><h2>Course not found</h2><p><a href="learn.html" style="color:var(--cmd-green);">Back to Learn</a></p></div>'; return; }
+
+  document.title = course.title + ' — CMDBLOCK';
+
+  let currentIndex = parseInt(params.get('lesson')) || 0;
+  if (isNaN(currentIndex) || currentIndex < 0) currentIndex = 0;
+  if (currentIndex >= course.lessons.length) currentIndex = course.lessons.length - 1;
+
+  const progress = cmdblock.getProgress();
+  const courseProgress = progress[course.progressKey] || { completed: 0, done: [] };
+  courseProgress.done = courseProgress.done || [];
+
+  function saveProgress() {
+    progress[course.progressKey] = courseProgress;
+    cmdblock.setProgress(progress);
+  }
+
+  function markDone(idx) {
+    if (!courseProgress.done.includes(idx)) {
+      courseProgress.done.push(idx);
+      courseProgress.completed = courseProgress.done.length;
+      saveProgress();
+    }
+  }
+
+  function renderSidebar() {
+    const sb = document.getElementById('lessonSidebar');
+    sb.innerHTML = `
+      <h3>${course.tier}</h3>
+      <div class="lesson-progress-bar"><div class="lesson-progress-fill" style="width:${(courseProgress.completed / course.lessons.length) * 100}%"></div></div>
+      <div class="lesson-progress-text">${courseProgress.completed} of ${course.lessons.length} done · ${Math.round((courseProgress.completed / course.lessons.length) * 100)}%</div>
+      <div class="lesson-nav">
+        ${course.lessons.map((l, i) => `
+          <button class="lesson-nav-item ${i === currentIndex ? 'active' : ''} ${courseProgress.done.includes(i) ? 'done' : ''}" data-idx="${i}">
+            <span class="ln-num">${courseProgress.done.includes(i) ? '✓' : i + 1}</span>
+            <span class="ln-name">${l.name}</span>
+          </button>`).join('')}
+      </div>
+      <div class="sidebar-foot">
+        <button class="btn btn-danger btn-sm" style="width:100%; justify-content:center;" onclick="window.__resetCourse()">Reset progress</button>
+      </div>`;
+    sb.querySelectorAll('.lesson-nav-item').forEach(b => b.addEventListener('click', () => {
+      currentIndex = parseInt(b.dataset.idx);
+      renderAll();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }));
+  }
+
+  function renderCompletionScreen() {
+    const m = document.getElementById('lessonMain');
+    const totalDone = Object.values(cmdblock.getProgress()).reduce((s, p) => s + (p?.completed || 0), 0);
+    const account = cmdblock.getAccount();
+    const roles = cmdblock.computeRoles(account, cmdblock.getProgress());
+
+    m.innerHTML = `
+      <div class="completion-screen">
+        <div class="complete-medal">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"/></svg>
+        </div>
+        <div style="font-family:'Silkscreen',monospace;font-size:0.7rem;letter-spacing:2px;color:${course.color};margin-bottom:10px;">${course.tier}</div>
+        <h1>Course <span class="green">complete!</span></h1>
+        <p class="complete-sub">You just mastered all ${course.lessons.length} lessons of <strong>${course.title}</strong>. ${account ? `${account.name}, your` : 'Your'} progress is locked in.</p>
+
+        <div class="completion-stats">
+          <div class="cs"><div class="cs-num">${course.lessons.length}</div><div class="cs-label">lessons done</div></div>
+          <div class="cs"><div class="cs-num">${totalDone}</div><div class="cs-label">total mastered</div></div>
+          <div class="cs"><div class="cs-num" style="font-size:0.95rem;line-height:1.4;color:${cmdblock.ROLES[roles[0]]?.color || 'var(--cmd-green)'};font-family:'Silkscreen',monospace;letter-spacing:1px;">${roles[0] || 'NOOBIE'}</div><div class="cs-label">current rank</div></div>
+        </div>
+
+        <div class="completion-actions">
+          <a href="${course.breadcrumb[0].href || 'learn.html'}" class="btn btn-primary">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="m12 19-7-7 7-7"/></svg>
+            Back to ${course.breadcrumb[0].name || 'Learn'}
+          </a>
+          <button class="btn btn-ghost" onclick="window.__review()">Review course</button>
+          ${account ? '<a href="profile.html" class="btn btn-ghost">See your profile</a>' : '<button class="btn btn-ghost" onclick="cmdblock.openModal(\'signupModal\')">Save progress</button>'}
+        </div>
+      </div>`;
+
+    // Confetti burst from medal
+    requestAnimationFrame(() => {
+      const medal = document.querySelector('.complete-medal');
+      if (medal) {
+        const r = medal.getBoundingClientRect();
+        cmdblock.confetti({ x: r.left + r.width / 2, y: r.top + r.height / 2 });
+        setTimeout(() => cmdblock.confetti({ x: r.left + r.width / 2, y: r.top + r.height / 2 }), 250);
+      }
+    });
+  }
+
+  window.__review = () => {
+    currentIndex = 0;
+    renderAll();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  function renderMain() {
+    const m = document.getElementById('lessonMain');
+    const l = course.lessons[currentIndex];
+    const isLast = currentIndex === course.lessons.length - 1;
+    const isFirst = currentIndex === 0;
+    const breadcrumbHtml = course.breadcrumb.map((b, i) => `${i ? '<span class="sep">›</span>' : ''}${b.href ? `<a href="${b.href}">${b.name}</a>` : `<span>${b.name}</span>`}`).join('');
+    const wipBadge = course.wip ? ' <span class="bento-tag" style="color:var(--gold);background:rgba(252,219,5,0.08);border-color:rgba(252,219,5,0.2);">WIP</span>' : '';
+
+    // Edition pill (derived from course id)
+    let editionPill = '';
+    if (courseId.startsWith('java-')) {
+      editionPill = `<span class="edition-pill java"><img src="assets/icons/Grass_Block.png" alt=""> JAVA EDITION</span>`;
+    } else if (courseId.startsWith('bedrock-')) {
+      editionPill = `<span class="edition-pill bedrock"><img src="assets/icons/bedrock.png" alt=""> BEDROCK EDITION</span>`;
+    }
+
+    m.innerHTML = `
+      <div class="lesson-topbar">
+        <div class="breadcrumb">${breadcrumbHtml}</div>
+        <div style="display:flex;align-items:center;gap:10px;">
+          ${editionPill}
+          <div class="progress-pill">${currentIndex + 1} / ${course.lessons.length}</div>
+        </div>
+      </div>
+      <div class="lesson-header">
+        <div class="lesson-tier" style="color:${course.color};">${course.tier}${wipBadge}</div>
+        <h1>${l.name}</h1>
+        <p>${l.summary}</p>
+      </div>
+      <div class="lesson-content">
+        <p>Welcome to lesson <strong>${currentIndex + 1}</strong> of <strong>${course.lessons.length}</strong>. Below is the full breakdown for <code class="inline">${l.name}</code>.</p>
+
+        <div class="tip-box info">
+          <div class="tip-title"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg> WHAT YOU'LL BUILD</div>
+          ${l.summary} A working example you can drop into a creative world right now.
+        </div>
+
+        <h2>Walkthrough</h2>
+        <p>Each step is broken down so you can run it, see what it does, and tweak it. Copy any block, paste it into chat or a command block, and watch the result.</p>
+
+        <div class="terminal">
+          <div class="terminal-bar">
+            <div class="t-dots"><span class="t-dot r"></span><span class="t-dot y"></span><span class="t-dot g"></span></div>
+            <span class="t-title">command preview</span>
+            <div style="width:54px;"></div>
+          </div>
+          <div class="terminal-body">
+            <span class="line"><span class="prefix">›</span><span class="cmd"><span class="slash">/</span>say Starting <span class="sel">"${l.name}"</span></span></span>
+            <span class="line out">[Server] Starting "${l.name}"</span>
+          </div>
+        </div>
+
+        <h3>Step 1 · Set the scene</h3>
+        <p>Run this in a test world. It establishes the state the rest of the lesson assumes.</p>
+
+        <h3>Step 2 · Run the command</h3>
+        <p>Now execute the command. Watch closely — every argument changes the behavior.</p>
+
+        <div class="tip-box warning">
+          <div class="tip-title"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> COMMON MISTAKE</div>
+          Forgetting to enable cheats — the command will silently fail. Open to LAN with cheats on, or set <code class="inline">commandBlockOutput</code> via <code class="inline">/gamerule</code> if outputs are missing.
+        </div>
+
+        <h3>Step 3 · Wire it together</h3>
+        <p>Chain the previous step into a command block so it runs automatically.</p>
+
+        <div class="tip-box tip">
+          <div class="tip-title"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> TRY THIS</div>
+          Once it's working, change the selector from <code class="inline">@p</code> to <code class="inline">@a</code>. Notice what changes.
+        </div>
+
+        <h2>What you now know</h2>
+        <ul>
+          <li>The exact syntax for <code class="inline">${l.name.toLowerCase().split(' ')[0]}</code></li>
+          <li>How to chain it with other commands</li>
+          <li>How to debug when it doesn't work</li>
+        </ul>
+
+        <p style="color:var(--text-faint); font-size:0.85rem; font-style:italic; padding-top:8px;">Full lesson content is being rebuilt for the redesign. The structure, progress tracking, and navigation are live — content drops in next.</p>
+      </div>
+
+      <div class="lesson-footer">
+        <button class="btn btn-ghost" ${isFirst ? 'disabled' : ''} onclick="window.__prev()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="m12 19-7-7 7-7"/></svg>
+          Previous
+        </button>
+        <button class="btn ${isLast ? 'btn-primary btn-finish' : 'btn-primary'}" onclick="window.__next()">
+          ${isLast ? '🏆 Finish course' : 'Mark done & continue'}
+          ${isLast ? '' : '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>'}
+        </button>
+      </div>`;
+  }
+
+  window.__prev = () => { if (currentIndex > 0) { currentIndex--; renderAll(); window.scrollTo({top:0,behavior:'smooth'}); } };
+  window.__next = () => {
+    const wasLast = currentIndex === course.lessons.length - 1;
+    markDone(currentIndex);
+    if (!wasLast) {
+      currentIndex++; renderAll(); window.scrollTo({top:0,behavior:'smooth'});
+    } else {
+      // Show the celebration screen in place
+      renderSidebar();
+      renderCompletionScreen();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  };
+  window.__resetCourse = async () => {
+    if (cmdblock.getPrefs().confirmDestructive !== false) {
+      const ok = await cmdblock.confirm(`Reset progress for "${course.title}"? This won't affect other courses.`, { title: 'RESET COURSE?', okLabel: 'Reset', danger: true });
+      if (!ok) return;
+    }
+    courseProgress.done = []; courseProgress.completed = 0; saveProgress(); renderAll();
+    cmdblock.toast('Course progress reset', { variant: 'warning' });
+  };
+
+  function renderAll() { renderSidebar(); renderMain(); }
+  renderAll();
+})();
+</script>
+</body>
+</html>
